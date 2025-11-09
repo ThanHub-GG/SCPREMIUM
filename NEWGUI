@@ -4,7 +4,7 @@ local Player = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RenderStepped = game:GetService("RunService").RenderStepped
+local RenderStepped = RunService.RenderStepped
 local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
 
 local function generateRandomString(length)
@@ -18,12 +18,16 @@ local function generateRandomString(length)
 end
 
 local Custom = {} do
-    -- SKEMA WARNA HYBRID (Ungu-Biru-Merah)
-    Custom.ColorRGB = Color3.fromRGB(138, 43, 226)      -- UNGU (Aksen Utama)
-    Custom.AccentColor = Color3.fromRGB(0, 191, 255)    -- BIRU CERAH (Latar Item)
-    Custom.DarkBlue = Color3.fromRGB(255, 69, 0)        -- MERAH ORANGE (Warna Kontras)
-    Custom.BackgroundDark = Color3.fromRGB(10, 10, 15)  -- LATAR BELAKANG SANGAT GELAP
-    Custom.FrameDark = Color3.fromRGB(25, 25, 35)       -- FRAME GELAP (Latar Panel & Input Box)
+    Custom.ColorRGB = Color3.fromRGB(25, 25, 112)
+    Custom.AccentColor = Color3.fromRGB(25, 25, 112)
+    Custom.DarkBlue = Color3.fromRGB(25, 25, 112)
+    Custom.BackgroundDark = Color3.fromRGB(12, 12, 25)
+    Custom.FrameDark = Color3.fromRGB(20, 20, 35)
+    
+    -- Terminal macOS Colors
+    Custom.MacRedButton = Color3.fromRGB(255, 95, 87)
+    Custom.MacYellowButton = Color3.fromRGB(255, 189, 68)
+    Custom.MacGreenButton = Color3.fromRGB(40, 201, 64)
 
     function Custom:Create(Name, Properties, Parent)
         local _instance = Instance.new(Name)
@@ -58,7 +62,7 @@ local function OpenClose()
 
   local UICorner = Custom:Create("UICorner", {
     Name = "MainCorner",
-    CornerRadius = UDim.new(0, 4), 
+    CornerRadius = UDim.new(0, 12),
   }, Close_ImageButton)
   local UIGradient = Custom:Create("UIGradient", {
     Color = ColorSequence.new{
@@ -253,12 +257,12 @@ function Speed_Library:SetNotification(Config)
         Name = "NotificationFrameReal"
     }, NotificationFrame)
 
-    Custom:Create("UICorner",{CornerRadius=UDim.new(0, 4)}, NotificationFrameReal) 
+    Custom:Create("UICorner",{CornerRadius=UDim.new(0,12)}, NotificationFrameReal)
     Custom:Create("UIGradient", {
         Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, Custom.BackgroundDark),
             ColorSequenceKeypoint.new(0.5, Custom.FrameDark),
-            ColorSequence.new(1, Custom.AccentColor)
+            ColorSequenceKeypoint.new(1, Custom.AccentColor)
         },
         Rotation = 135,
     }, NotificationFrameReal)
@@ -308,7 +312,7 @@ function Speed_Library:SetNotification(Config)
     })
 
     Custom:Create("UIStroke",{Color=Color3.fromRGB(255,255,255),Thickness=0.5,Parent=TextLabel})
-    Custom:Create("UICorner",{Parent=Top,CornerRadius=UDim.new(0, 4)}) 
+    Custom:Create("UICorner",{Parent=Top,CornerRadius=UDim.new(0,8)})
 
     local TextLabel1 = Custom:Create("TextLabel", {
         Font=Enum.Font.GothamBold,
@@ -330,7 +334,7 @@ function Speed_Library:SetNotification(Config)
         BackgroundTransparency=0.999,
         AnchorPoint=Vector2.new(1,0.5),
         Position=UDim2.new(1,-5,0.5,0),
-        Size = UDim2.new(0,25,0,25),
+        Size=UDim2.new(0,25,0,25),
         Name="Close",
         Parent=Top
     })
@@ -342,7 +346,7 @@ function Speed_Library:SetNotification(Config)
         BackgroundTransparency=0.999,
         BorderSizePixel=0,
         Position=UDim2.new(0.49,0,0.5,0),
-        Size = UDim2.new(1,-8,1,-8),
+        Size=UDim2.new(1,-8,1,-8),
         Parent=Close
     })
 
@@ -356,7 +360,7 @@ function Speed_Library:SetNotification(Config)
         BackgroundTransparency=0.999,
         BorderSizePixel=0,
         Position=UDim2.new(0,10,0,27),
-        Size = UDim2.new(1,-20,0,13),
+        Size=UDim2.new(1,-20,0,13),
         Parent=NotificationFrameReal,
         TextWrapped=true
     })
@@ -431,7 +435,7 @@ function Speed_Library:CreateWindow(Config)
     local Main = Custom:Create("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = Custom.BackgroundDark,
-        BackgroundTransparency = 0.01, 
+        BackgroundTransparency = 0.213,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -440,7 +444,7 @@ function Speed_Library:CreateWindow(Config)
     }, DropShadow)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 0) -- KOTAK
+        CornerRadius = UDim.new(0, 10)
     }, Main)
 
     Custom:Create("UIGradient", {
@@ -454,14 +458,13 @@ function Speed_Library:CreateWindow(Config)
     }, Main)
 
     Custom:Create("UIStroke", {
-        Color = Custom.ColorRGB,
+        Color = Color3.fromRGB(255, 255, 255),
         Thickness = 2,
-        Transparency = 0.3
+        Transparency = 0.5
     }, Main)
 
     local Top = Custom:Create("Frame", {
-        BackgroundColor3 = Custom.BackgroundDark,
-        BackgroundTransparency = 0.2,
+        BackgroundTransparency = 0.4,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         Size = UDim2.new(1, 0, 0, 38),
@@ -476,6 +479,113 @@ function Speed_Library:CreateWindow(Config)
         Rotation = 90,
     }, Top)
 
+    -- macOS/Linux Terminal Style Buttons Container (Kiri untuk Hijau)
+    local TweenService = game:GetService("TweenService")
+
+    local GreenButtonContainer = Custom:Create("Frame", {
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 12, 0, 0),
+        Size = UDim2.new(0, 12, 1, 0),
+        Name = "GreenButtonContainer"
+    }, Top)
+
+    local GreenButton = Custom:Create("Frame", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Color3.fromRGB(255, 59, 48),
+        Position = UDim2.new(0, 0, 0.5, 0),
+        Size = UDim2.new(0, 12, 0, 12),
+        Name = "GreenButton"
+    }, GreenButtonContainer)
+
+    Custom:Create("UICorner", {
+        CornerRadius = UDim.new(1, 0)
+    }, GreenButton)
+
+    local Stroke = Custom:Create("UIStroke", {
+        Color = Color3.fromRGB(200, 40, 30),
+        Thickness = 1,
+        Transparency = 0.3
+    }, GreenButton)
+
+    local tweenInfo = TweenInfo.new(
+        3,
+        Enum.EasingStyle.Quad,
+        Enum.EasingDirection.InOut
+    )
+
+    local buttonTween = TweenService:Create(GreenButton, tweenInfo, {
+        BackgroundColor3 = Custom.MacGreenButton
+    })
+    local strokeTween = TweenService:Create(Stroke, tweenInfo, {
+        Color = Color3.fromRGB(30, 150, 50)
+    })
+    buttonTween:Play()
+    strokeTween:Play()
+
+    local RightButtonsContainer = Custom:Create("Frame", {
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(1, 0),
+        Position = UDim2.new(1, -12, 0, 0),
+        Size = UDim2.new(0, 52, 1, 0),
+        Name = "RightButtonsContainer"
+    }, Top)
+
+    local GreenButton2 = Custom:Create("Frame", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Custom.MacGreenButton,
+        Position = UDim2.new(0, 0, 0.5, 0),
+        Size = UDim2.new(0, 12, 0, 12),
+        Name = "GreenButton2"
+    }, RightButtonsContainer)
+
+    Custom:Create("UICorner", {
+        CornerRadius = UDim.new(1, 0)
+    }, GreenButton2)
+
+    Custom:Create("UIStroke", {
+        Color = Color3.fromRGB(30, 150, 50),
+        Thickness = 1,
+        Transparency = 0.3
+    }, GreenButton2)
+
+    local YellowButton = Custom:Create("TextButton", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Custom.MacYellowButton,
+        Position = UDim2.new(0, 20, 0.5, 0),
+        Size = UDim2.new(0, 12, 0, 12),
+        Text = "",
+        Name = "YellowButton"
+    }, RightButtonsContainer)
+
+    Custom:Create("UICorner", {
+        CornerRadius = UDim.new(1, 0)
+    }, YellowButton)
+
+    Custom:Create("UIStroke", {
+        Color = Color3.fromRGB(200, 150, 50),
+        Thickness = 1,
+        Transparency = 0.3
+    }, YellowButton)
+
+    local RedButton = Custom:Create("TextButton", {
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Custom.MacRedButton,
+        Position = UDim2.new(0, 40, 0.5, 0),
+        Size = UDim2.new(0, 12, 0, 12),
+        Text = "",
+        Name = "RedButton"
+    }, RightButtonsContainer)
+
+    Custom:Create("UICorner", {
+        CornerRadius = UDim.new(1, 0)
+    }, RedButton)
+
+    Custom:Create("UIStroke", {
+        Color = Color3.fromRGB(200, 70, 60),
+        Thickness = 1,
+        Transparency = 0.3
+    }, RedButton)
+
     local TextLabel = Custom:Create("TextLabel", {
         Font = Enum.Font.GothamBold,
         Text = Title,
@@ -486,12 +596,12 @@ function Speed_Library:CreateWindow(Config)
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.5, 0, 0.35, 0),
-        Size = UDim2.new(0.5, 0, 0.3, 0)
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Size = UDim2.new(0.6, 0, 0.5, 0)
     }, Top)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 0) -- KOTAK
+        CornerRadius = UDim.new(0, 16)
     }, Top)
 
     Custom:Create("UIStroke", {
@@ -504,14 +614,14 @@ function Speed_Library:CreateWindow(Config)
         Font = Enum.Font.GothamBold,
         Text = Description,
         TextColor3 = Custom.ColorRGB,
-        TextSize = 14,
+        TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Center,
         TextYAlignment = Enum.TextYAlignment.Center,
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.5, 0, 0.72, 0),
-        Size = UDim2.new(0.5, 0, 0.3, 0)
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0.5, TextLabel.TextBounds.X/2 + 5, 0.5, 0),
+        Size = UDim2.new(0, 200, 0.5, 0)
     }, Top)
 
     Custom:Create("UIStroke", {
@@ -519,63 +629,8 @@ function Speed_Library:CreateWindow(Config)
         Thickness = 0.6
     }, TextLabel1)
 
-    local Close = Custom:Create("TextButton", {
-        Font = Enum.Font.SourceSans,
-        Text = "",
-        TextColor3 = Color3.fromRGB(0, 0, 0),
-        TextSize = 14,
-        AnchorPoint = Vector2.new(1, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.9990000128746033,
-        BorderColor3 = Color3.fromRGB(0, 0, 0),
-        BorderSizePixel = 0,
-        Position = UDim2.new(1, -8, 0.5, 0),
-        Size = UDim2.new(0, 25, 0, 25),
-        Name = "Close"
-    }, Top)
-
-    local ImageLabel1 = Custom:Create("ImageLabel", {
-        Image = "rbxassetid://9886659671",
-        ImageColor3 = Custom.ColorRGB,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.9990000128746033,
-        BorderColor3 = Color3.fromRGB(0, 0, 0),
-        BorderSizePixel = 0,
-        Position = UDim2.new(0.49, 0, 0.5, 0),
-        Size = UDim2.new(1, -8, 1, -8)
-    }, Close)
-
-    local Min = Custom:Create("TextButton", {
-        Font = Enum.Font.SourceSans,
-        Text = "",
-        TextColor3 = Color3.fromRGB(0, 0, 0),
-        TextSize = 14,
-        AnchorPoint = Vector2.new(1, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.9990000128746033,
-        BorderColor3 = Color3.fromRGB(0, 0, 0),
-        BorderSizePixel = 0,
-        Position = UDim2.new(1, -42, 0.5, 0),
-        Size = UDim2.new(0, 25, 0, 25),
-        Name = "Min"
-    }, Top)
-
-    Custom:Create("ImageLabel", {
-        Image = "rbxassetid://9886659276",
-        ImageColor3 = Custom.DarkBlue,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 1,
-        BorderColor3 = Color3.fromRGB(0, 0, 0),
-        BorderSizePixel = 0,
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        Size = UDim2.new(1, -8, 1, -8)
-    }, Min)
-
     local LayersTab = Custom:Create("Frame", {
-        BackgroundColor3 = Custom.FrameDark,
-        BackgroundTransparency = 0.1,
+        BackgroundTransparency = 0.5,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         Position = UDim2.new(0, 9, 0, 50),
@@ -584,13 +639,13 @@ function Speed_Library:CreateWindow(Config)
     }, Main)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 0) -- KOTAK
+        CornerRadius = UDim.new(0, 8)
     }, LayersTab)
 
     Custom:Create("UIGradient", {
         Color = ColorSequence.new{
-            ColorSequenceKeypoint.new(0, Custom.FrameDark),
-            ColorSequenceKeypoint.new(1, Custom.AccentColor)
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 45)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 60))
         },
         Rotation = 45,
     }, LayersTab)
@@ -598,22 +653,21 @@ function Speed_Library:CreateWindow(Config)
     Custom:Create("UIStroke", {
         Color = Custom.ColorRGB,
         Thickness = 1,
-        Transparency = 0.6
+        Transparency = 0.4
     }, LayersTab)
 
-    local DecideFrame = Custom:Create("Frame", {
-        AnchorPoint = Vector2.new(0, 0), 
+    Custom:Create("Frame", {
+        AnchorPoint = Vector2.new(0.5, 0),
         BackgroundColor3 = Custom.ColorRGB,
         BackgroundTransparency = 0.3,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 9, 0, 38), 
-        Size = UDim2.new(1, -18, 0, 2), 
+        Position = UDim2.new(0.5, 0, 0, 38),
+        Size = UDim2.new(1, 0, 0, 2),
         Name = "DecideFrame"
     }, Main)
 
     local Layers = Custom:Create("Frame", {
-        BackgroundColor3 = Custom.FrameDark,
         BackgroundTransparency = 0.1,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -623,7 +677,7 @@ function Speed_Library:CreateWindow(Config)
     }, Main)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 0) -- KOTAK
+        CornerRadius = UDim.new(0, 8)
     }, Layers)
 
     Custom:Create("UIGradient", {
@@ -636,7 +690,6 @@ function Speed_Library:CreateWindow(Config)
     }, Layers)
 
     Custom:Create("UIStroke", {
-        Color = Custom.DarkBlue,
         Thickness = 1,
         Transparency = 0.5
     }, Layers)
@@ -648,6 +701,7 @@ function Speed_Library:CreateWindow(Config)
         TextSize = 24,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.9990000128746033,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -718,10 +772,14 @@ function Speed_Library:CreateWindow(Config)
     ScrollTab.ChildAdded:Connect(UpdateSize)
     ScrollTab.ChildRemoved:Connect(UpdateSize)
 
-    Min.Activated:Connect(function()
-        CircleClick(Min, Player:GetMouse().X, Player:GetMouse().Y)
+    -- Yellow Button (Minimize) functionality
+    YellowButton.Activated:Connect(function()
+        -- Hover effect
+        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
+        task.wait(0.1)
+        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Custom.MacYellowButton}):Play()
+        
         DropShadowHolder.Visible = false
-
         if not Open_Close.Visible then Open_Close.Visible = true end
     end)
 
@@ -730,10 +788,31 @@ function Speed_Library:CreateWindow(Config)
         if Open_Close.Visible then Open_Close.Visible = false end
     end)
 
-    Close.Activated:Connect(function()
-        CircleClick(Close, Player:GetMouse().X, Player:GetMouse().Y)
+    -- Red Button (Close) functionality
+    RedButton.Activated:Connect(function()
+        -- Hover effect
+        TweenService:Create(RedButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
+        task.wait(0.1)
+        
         if SpeedHubXGui then SpeedHubXGui:Destroy() end
         if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
+    end)
+
+    -- Hover effects for mac buttons
+    RedButton.MouseEnter:Connect(function()
+        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
+    end)
+
+    RedButton.MouseLeave:Connect(function()
+        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacRedButton}):Play()
+    end)
+
+    YellowButton.MouseEnter:Connect(function()
+        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
+    end)
+
+    YellowButton.MouseLeave:Connect(function()
+        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacYellowButton}):Play()
     end)
 
     DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
@@ -743,6 +822,7 @@ function Speed_Library:CreateWindow(Config)
         AnchorPoint = Vector2.new(1, 1),
         BackgroundColor3 = Custom.BackgroundDark,
         BackgroundTransparency = 1,
+        BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         ClipsDescendants = true,
         Position = UDim2.new(1, 8, 1, 8),
@@ -784,7 +864,7 @@ function Speed_Library:CreateWindow(Config)
     }, DropShadowHolder1)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 12)
     }, MoreBlur)
 
     local ConnectButton = Custom:Create("TextButton", {
@@ -816,8 +896,8 @@ function Speed_Library:CreateWindow(Config)
         if MoreBlur.Visible then
             local tweenInfo = TweenInfo.new(0.2)
 
-            local _Hide = TweenService:Create(MoreBlur, tweenInfo, {BackgroundTransparency = 0.7})
-            local _Move = TweenService:Create(DropdownSelect, tweenInfo, {Position = UDim2.new(1, -11, 0.5, 0)})
+            local _Hide = TweenService:Create(MoreBlur, tweenInfo, {BackgroundTransparency = 0.999})
+            local _Move = TweenService:Create(DropdownSelect, tweenInfo, {Position = UDim2.new(1, 172, 0.5, 0)})
 
             _Hide:Play()
             _Move:Play()
@@ -828,7 +908,7 @@ function Speed_Library:CreateWindow(Config)
     end)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4), 
+        CornerRadius = UDim.new(0, 8),
     }, DropdownSelect)
 
     Custom:Create("UIGradient", {
@@ -908,7 +988,7 @@ function Speed_Library:CreateWindow(Config)
         }, ScrollTab)
 
         Custom:Create("UICorner", {
-            CornerRadius = UDim.new(0, 0), -- KOTAK
+            CornerRadius = UDim.new(0, 8),
         }, Tab)
 
         Custom:Create("UIGradient", {
@@ -932,6 +1012,7 @@ function Speed_Library:CreateWindow(Config)
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BackgroundTransparency = 0.999,
             BorderColor3 = Color3.fromRGB(0, 0, 0),
             BorderSizePixel = 0,
@@ -945,6 +1026,7 @@ function Speed_Library:CreateWindow(Config)
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BackgroundTransparency = 0.9990000128746033,
             BorderColor3 = Color3.fromRGB(0, 0, 0),
             BorderSizePixel = 0,
@@ -962,6 +1044,7 @@ function Speed_Library:CreateWindow(Config)
         Custom:Create("ImageLabel", {
             Image = Icon,
             ImageColor3 = Custom.ColorRGB,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BackgroundTransparency = 0.999,
             BorderColor3 = Color3.fromRGB(0, 0, 0),
             BorderSizePixel = 0,
@@ -978,8 +1061,8 @@ function Speed_Library:CreateWindow(Config)
                 BackgroundColor3 = Custom.ColorRGB,
                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0, 0), 
-                Size = UDim2.new(0, 2, 1, 0), 
+                Position = UDim2.new(0, 3, 0, 12),
+                Size = UDim2.new(0, 2, 0, 16),
                 Name = "ChooseFrame",
             }, Tab)
     
@@ -989,7 +1072,7 @@ function Speed_Library:CreateWindow(Config)
             }, ChooseFrame)
     
             Custom:Create("UICorner", {
-                CornerRadius = UDim.new(0, 0) -- KOTAK
+                CornerRadius = UDim.new(0, 3)
             }, ChooseFrame)
 
             Custom:Create("UIGradient", {
@@ -1006,25 +1089,20 @@ function Speed_Library:CreateWindow(Config)
             CircleClick(TabButton, Player:GetMouse().X, Player:GetMouse().Y)
             local FrameChoose = nil
 
-            -- Mencari FrameChoose yang sudah ada, terlepas dari di Tab mana ia berada
             for _, s in pairs(ScrollTab:GetChildren()) do
-                if s:IsA("Frame") then
-                    local chooseFrame = s:FindFirstChild("ChooseFrame")
-                    if chooseFrame then
-                        FrameChoose = chooseFrame
+                for _, v in pairs(s:GetChildren()) do
+                    if v.Name == "ChooseFrame" then
+                        FrameChoose = v
                         break
                     end
                 end
+
+                if FrameChoose then break end
             end
     
             if FrameChoose and Tab.LayoutOrder ~= LayersPageLayout.CurrentPage.LayoutOrder then
-                
-                -- PERBAIKAN: Pindahkan FrameChoose menjadi anak dari Tab yang baru diklik
-                FrameChoose.Parent = Tab
-                
-                -- Reset transparansi tab lain (kode yang sudah ada)
                 for _, TabFrame in pairs(ScrollTab:GetChildren()) do
-                    if TabFrame.Name == "Tab" and TabFrame ~= Tab then
+                    if TabFrame.Name == "Tab" then
                         local stroke = TabFrame:FindFirstChild("UIStroke")
                         TweenService:Create(TabFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.7}):Play()
                         if stroke then
@@ -1035,11 +1113,7 @@ function Speed_Library:CreateWindow(Config)
     
                 local _TabT = TweenService:Create(Tab, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.3})
                 local _TabStroke = TweenService:Create(Tab:FindFirstChild("UIStroke"), TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.InOut), {Transparency = 0.2})
-                
-                -- PERBAIKAN: Tween FrameChoose ke posisi (0, 0) relatif terhadap Tab baru.
-                local _FTween = TweenService:Create(FrameChoose, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
-                    Position = UDim2.new(0, 0, 0, 0) 
-                })
+                local _FTween = TweenService:Create(FrameChoose, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Position = UDim2.new(0, 3, 0, 12 + (37 * Tab.LayoutOrder))})
     
                 _TabT:Play()
                 _TabStroke:Play()
@@ -1050,11 +1124,10 @@ function Speed_Library:CreateWindow(Config)
                 task.wait(0.05)
                 NameTab.Text = _Name
     
-                -- Animasi ukuran (tetap dipertahankan)
-                TweenService:Create(FrameChoose, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 4, 1, 0)}):Play()
+                TweenService:Create(FrameChoose, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 2, 0, 22)}):Play()
     
                 task.wait(0.2)
-                TweenService:Create(FrameChoose, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0, 2, 1, 0)}):Play()
+                TweenService:Create(FrameChoose, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 2, 0, 16)}):Play()
             end
         end)
 
@@ -1076,8 +1149,8 @@ function Speed_Library:CreateWindow(Config)
             }, ScrolLayers)
     
             local SectionReal = Custom:Create("Frame", {
-                BackgroundColor3 = Custom.FrameDark,
                 AnchorPoint = Vector2.new(0.5, 0),
+                BackgroundColor3 = Custom.FrameDark,
                 BackgroundTransparency = 0.2,
                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
@@ -1088,7 +1161,7 @@ function Speed_Library:CreateWindow(Config)
             }, Section)
     
             Custom:Create("UICorner", {
-                CornerRadius = UDim.new(0, 4) 
+                CornerRadius = UDim.new(0, 8)
             }, SectionReal)
 
             Custom:Create("UIGradient", {
@@ -1110,6 +1183,7 @@ function Speed_Library:CreateWindow(Config)
                 Text = "",
                 TextColor3 = Color3.fromRGB(0, 0, 0),
                 TextSize = 14,
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                 BackgroundTransparency = 0.999,
                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
@@ -1129,13 +1203,14 @@ function Speed_Library:CreateWindow(Config)
             }, SectionReal)
 
             Custom:Create("UICorner", {
-                CornerRadius = UDim.new(0, 4) 
+                CornerRadius = UDim.new(0, 6)
             }, FeatureFrame)
     
             local FeatureImg = Custom:Create("ImageLabel", {
                 Image = "rbxassetid://16851841101",
                 ImageColor3 = Color3.fromRGB(255, 255, 255),
                 AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                 BackgroundTransparency = 0.9990000128746033,
                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
@@ -1154,6 +1229,7 @@ function Speed_Library:CreateWindow(Config)
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                 BackgroundTransparency = 0.9990000128746033,
                 BorderColor3 = Color3.fromRGB(0, 0, 0),
                 BorderSizePixel = 0,
@@ -1174,7 +1250,7 @@ function Speed_Library:CreateWindow(Config)
       }, Section)
 
       Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 2)
       }, SectionDecideFrame)
 
       Custom:Create("UIGradient", {
@@ -1187,6 +1263,7 @@ function Speed_Library:CreateWindow(Config)
   
       local SectionAdd = Custom:Create("Frame", {
         AnchorPoint = Vector2.new(0.5, 0),
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.9990000128746033,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -1198,7 +1275,7 @@ function Speed_Library:CreateWindow(Config)
       }, Section)
   
       Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 6)
       }, SectionAdd)
     
       Custom:Create("UIListLayout", {
@@ -1356,13 +1433,15 @@ function Item:AddParagraph(Config)
 
     return SettingFuncs
 end
+
+
       function Item:AddSeperator(Config)
         local Title = Config[1] or Config.Title or ""
         local Sep_Funcs = {}
 
         local Seperator = Custom:Create("Frame", {
-          BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-          BackgroundTransparency = 0.85, 
+          BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+          BackgroundTransparency = 0.1,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 1,
           LayoutOrder = ItemCount,
@@ -1373,12 +1452,13 @@ end
         local SeperatorTitle = Custom:Create("TextLabel", {
           Font = Enum.Font.GothamBold,
           Text = Title,
-          TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-          TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-          TextStrokeTransparency = 0.7,
+          TextColor3 = Color3.fromRGB(231, 231, 231),
+          TextStrokeColor3 = Color3.fromRGB(0, 0, 0),
+          TextStrokeTransparency = 0.8,
           TextSize = 14,
           TextXAlignment = Enum.TextXAlignment.Left,
           TextYAlignment = Enum.TextYAlignment.Center,
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 1,
           BorderSizePixel = 0,
           Position = UDim2.new(0, 12, 0, 0),
@@ -1386,14 +1466,8 @@ end
           Name = "SeperatorTitle",
         }, Seperator)
         
-        Custom:Create("UIStroke", {
-            Color = Color3.fromRGB(255, 255, 255),
-            Thickness = 0.2, 
-            Transparency = 0.5,
-        }, SeperatorTitle)
-        
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4), 
+          CornerRadius = UDim.new(0, 6),
         }, Seperator)
         
         local Gradient = Custom:Create("UIGradient", {
@@ -1418,15 +1492,15 @@ end
         local LineFuncs = {}
     
         local Line = Custom:Create("Frame", {
-          BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-          BackgroundTransparency = 0.7, 
+          BackgroundColor3 = Color3.fromRGB(90, 90, 90),
+          BackgroundTransparency = 0.2,
           BorderSizePixel = 0,
           LayoutOrder = ItemCount,
           Size = UDim2.new(1, 0, 0, 7),
           Name = "Line",
         }, SectionAdd)
     
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, Line) 
+        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 3)}, Line)
     
         Custom:Create("UIGradient", {
           Color = ColorSequence.new{
@@ -1449,38 +1523,31 @@ end
 
         local Button = Custom:Create("Frame", {
 					Name = "Button",
-					BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-					BackgroundTransparency = 0.85, 
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					BackgroundTransparency = 0.935,
 					BorderSizePixel = 0,
 					LayoutOrder = ItemCount,
 					Size = UDim2.new(1, 0, 0, 35)
 				}, SectionAdd)
 
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4) 
+          CornerRadius = UDim.new(0, 4)
         }, Button)
 
-        local ButtonTitle = Custom:Create("TextLabel", {
+        Custom:Create("TextLabel", {
 					Name = "ButtonTitle",
 					Font = Enum.Font.GothamBold,
 					Text = Title,
-					TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-                    TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-                    TextStrokeTransparency = 0.7,
+					TextColor3 = Color3.fromRGB(231, 231, 231),
 					TextSize = 13,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Top,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 0.999,
 					BorderSizePixel = 0,
 					Position = UDim2.new(0, 10, 0, 10),
 					Size = UDim2.new(1, -100, 0, 13)
 				}, Button)
-                
-        Custom:Create("UIStroke", {
-            Color = Color3.fromRGB(255, 255, 255),
-            Thickness = 0.2, 
-            Transparency = 0.5,
-        }, ButtonTitle)
 
         local ButtonContent = Custom:Create("TextLabel", {
 					Name = "ButtonContent",
@@ -1491,17 +1558,12 @@ end
 					TextTransparency = 0.6,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Bottom,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 0.999,
 					BorderSizePixel = 0,
 					Position = UDim2.new(0, 10, 0, 23),
 					Size = UDim2.new(1, -100, 0, 12)
 				}, Button)
-        
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.2, 
-            Transparency = 0.6,
-        }, ButtonContent)
 
         local function UpdateButtonSize()
           local _Height = 12 + (12 * (ButtonContent.TextBounds.X // ButtonContent.AbsoluteSize.X))
@@ -1526,6 +1588,7 @@ end
 					Text = "",
 					TextColor3 = Color3.fromRGB(0, 0, 0),
 					TextSize = 14,
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 					BackgroundTransparency = 0.999,
 					BorderSizePixel = 0,
 					Size = UDim2.new(1, 0, 1, 0)
@@ -1534,22 +1597,18 @@ end
         local FeatureFrame1 = Custom:Create("Frame", {
 					Name = "FeatureFrame",
 					AnchorPoint = Vector2.new(1, 0.5),
-					BackgroundColor3 = Custom.ColorRGB, 
-					BackgroundTransparency = 0, 
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+					BackgroundTransparency = 0.999,
 					BorderSizePixel = 0,
 					Position = UDim2.new(1, -15, 0.5, 0),
 					Size = UDim2.new(0, 25, 0, 25)
 				}, Button)
 
-        Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4) 
-        }, FeatureFrame1)
-
         Custom:Create("ImageLabel", {
           Name = "FeatureImg",
           Image = Icon,
-          ImageColor3 = Color3.fromRGB(255, 255, 255), 
           AnchorPoint = Vector2.new(0.5, 0.5),
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 0.999,
           BorderSizePixel = 0,
           Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -1570,42 +1629,34 @@ function Item:AddToggle(Config)
     local Title = Config[1] or Config.Title or ""
     local Content = Config[2] or Config.Content or ""
     local Default = Config[3] or Config.Default or false
-    local Mode = Config[4] or Config.Mode or "Toggle" 
+    local Mode = Config[4] or Config.Mode or "Toggle" -- "Toggle" atau "Box"
     local Callback = Config[5] or Config.Callback or function() end
 
     local Funcs_Toggle = {Value = Default}
 
     local Toggle = Custom:Create("Frame", {
-        BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-        BackgroundTransparency = 0.85, 
+        Name = "Toggle",
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        BackgroundTransparency = 0.935,
         BorderSizePixel = 0,
         LayoutOrder = ItemCount,
-        Size = UDim2.new(1, 0, 0, 35),
-        Name = "Toggle",
+        Size = UDim2.new(1, 0, 0, 35)
     }, SectionAdd)
 
-    Custom:Create("UICorner", { CornerRadius = UDim.new(0, 4) }, Toggle) 
+    Custom:Create("UICorner", { CornerRadius = UDim.new(0, 4) }, Toggle)
 
     local ToggleTitle = Custom:Create("TextLabel", {
         Name = "ToggleTitle",
         Font = Enum.Font.GothamBold,
         Text = Title,
         TextSize = 13,
-        TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-        TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-        TextStrokeTransparency = 0.7,
+        TextColor3 = Color3.fromRGB(231, 231, 231),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Top,
         BackgroundTransparency = 0.999,
         Position = UDim2.new(0, 10, 0, 10),
         Size = UDim2.new(1, -100, 0, 13)
     }, Toggle)
-    
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(255, 255, 255),
-        Thickness = 0.2, 
-        Transparency = 0.5,
-    }, ToggleTitle)
 
     local ToggleContent = Custom:Create("TextLabel", {
         Name = "ToggleContent",
@@ -1620,12 +1671,6 @@ function Item:AddToggle(Config)
         Position = UDim2.new(0, 10, 0, 23),
         Size = UDim2.new(1, -100, 0, 12)
     }, Toggle)
-    
-    Custom:Create("UIStroke", {
-        Color = Custom.ColorRGB,
-        Thickness = 0.2, 
-        Transparency = 0.6,
-    }, ToggleContent)
 
     local function UpdateToggleSize()
         ToggleContent.TextWrapped = false
@@ -1653,14 +1698,14 @@ function Item:AddToggle(Config)
     local FeatureFrame = Custom:Create("Frame", {
         Name = "FeatureFrame",
         AnchorPoint = Vector2.new(1, 0.5),
-        BackgroundColor3 = (Mode == "Toggle") and Color3.fromRGB(255, 255, 255) or Custom.FrameDark, 
+        BackgroundColor3 = (Mode == "Toggle") and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 0, 0),
         BackgroundTransparency = (Mode == "Toggle") and 0.92 or 0.3,
         BorderSizePixel = 0,
         Position = UDim2.new(1, -15, 0.5, 0),
         Size = UDim2.new(0, 30, 0, 15)
     }, Toggle)
 
-    Custom:Create("UICorner", { CornerRadius = UDim.new(0, 15) }, FeatureFrame) 
+    Custom:Create("UICorner", { CornerRadius = UDim.new(0, 4) }, FeatureFrame)
     local UIStroke = Custom:Create("UIStroke", {
         Color = Color3.fromRGB(255, 255, 255),
         Thickness = 2,
@@ -1676,7 +1721,7 @@ function Item:AddToggle(Config)
             Size = UDim2.new(0, 14, 0, 14),
             Position = UDim2.new(0, 0, 0, 0)
         }, FeatureFrame)
-        Custom:Create("UICorner", { CornerRadius = UDim.new(0, 15) }, ToggleCircle) 
+        Custom:Create("UICorner", { CornerRadius = UDim.new(0, 15) }, ToggleCircle)
     end
 
     local function Animate(Value)
@@ -1695,8 +1740,8 @@ function Item:AddToggle(Config)
             TweenService:Create(FeatureFrame, tweenInfo, {BackgroundColor3 = FrameColor, BackgroundTransparency = FrameTransparency}):Play()
         else
             -- Mode Box simple nyala/mati
-            local FrameColor = Value and Custom.ColorRGB or Custom.FrameDark 
-            local Transparency = Value and 0.3 or 0.3 
+            local FrameColor = Value and Custom.ColorRGB or Color3.fromRGB(0,0,0)
+            local Transparency = Value and 0 or 0.3
             TweenService:Create(FeatureFrame, TweenInfo.new(0.2), {BackgroundColor3 = FrameColor, BackgroundTransparency = Transparency}):Play()
         end
     end
@@ -1728,8 +1773,8 @@ end
 				local Funcs_Slider = {Value = Default}
         
         local Slider = Custom:Create("Frame", {
-					BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-					BackgroundTransparency = 0.85, 
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					BackgroundTransparency = 0.9350000023841858,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					LayoutOrder = ItemCount,
@@ -1738,18 +1783,17 @@ end
 				}, SectionAdd)
 
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4), 
+          CornerRadius = UDim.new(0, 4),
         }, Slider)
 
-        local SliderTitle = Custom:Create("TextLabel", {
+        Custom:Create("TextLabel", {
 					Font = Enum.Font.GothamBold,
 					Text = Title,
-					TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-                    TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-                    TextStrokeTransparency = 0.7,
+					TextColor3 = Color3.fromRGB(230, 230, 230),
 					TextSize = 13,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Top,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 0.9990000128746033,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
@@ -1757,12 +1801,6 @@ end
 					Size = UDim2.new(1, -180, 0, 13),
 					Name = "SliderTitle",
 				}, Slider)
-                
-        Custom:Create("UIStroke", {
-            Color = Color3.fromRGB(255, 255, 255),
-            Thickness = 0.2, 
-            Transparency = 0.5,
-        }, SliderTitle)
 
 				local SliderContent = Custom:Create("TextLabel", {
 					Font = Enum.Font.GothamBold,
@@ -1772,6 +1810,7 @@ end
 					TextTransparency = 0.6000000238418579,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Bottom,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 0.9990000128746033,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
@@ -1779,12 +1818,6 @@ end
 					Size = UDim2.new(1, -180, 0, 12),
 					Name = "SliderContent",
 				}, Slider)
-                
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.2, 
-            Transparency = 0.6,
-        }, SliderContent)
 
         local function UpdateSliderSize()
           SliderContent.TextWrapped = false
@@ -1801,8 +1834,7 @@ end
 
         local SliderInput = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0, 0.5),
-					BackgroundColor3 = Custom.FrameDark, -- MODIFIKASI: Input box menjadi gelap
-					BackgroundTransparency = 0.3, -- MODIFIKASI: Transparansi rendah (solid)
+					BackgroundColor3 = Custom.ColorRGB,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					Position = UDim2.new(1, -155, 0.5, 0),
@@ -1811,7 +1843,7 @@ end
 				}, Slider)
 
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4), 
+          CornerRadius = UDim.new(0, 5),
         }, SliderInput)
 
          
@@ -1821,23 +1853,17 @@ end
 					TextColor3 = Color3.fromRGB(255, 255, 255),
 					TextSize = 13,
 					TextWrapped = true,
+					BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 					BackgroundTransparency = 0.9990000128746033,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
 					Position = UDim2.new(0, -1, 0, 0),
 					Size = UDim2.new(1, 0, 1, 0),
 				}, SliderInput)
-                
-        -- Efek menyala pada teks input
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.5,
-            Transparency = 0.4,
-        }, TextBox)
 
         local SliderFrame = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5),
-					BackgroundColor3 = Custom.FrameDark, 
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 0.800000011920929,
 					BorderColor3 = Color3.fromRGB(0, 0, 0),
 					BorderSizePixel = 0,
@@ -1846,7 +1872,7 @@ end
 					Name = "SliderFrame",
 				}, Slider)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, SliderFrame) 
+        Custom:Create("UICorner", {}, SliderFrame)
 
         local SliderDraggable = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0, 0.5),
@@ -1858,7 +1884,7 @@ end
 					Name = "SliderDraggable",
 				}, SliderFrame)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, SliderDraggable) 
+        Custom:Create("UICorner", {}, SliderDraggable)
 
         local SliderCircle = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5),
@@ -1870,7 +1896,7 @@ end
 					Name = "SliderCircle",
 				}, SliderDraggable)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, SliderCircle) 
+        Custom:Create("UICorner", {}, SliderCircle)
 
         Custom:Create("UIStroke", {
           Color = Custom.ColorRGB,
@@ -1955,8 +1981,8 @@ end
 				local Funcs_Input = {Value = Default}
 
         local Input = Custom:Create("Frame", {
-          BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-          BackgroundTransparency = 0.85, 
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+          BackgroundTransparency = 0.935,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 0,
           LayoutOrder = ItemCount,
@@ -1965,18 +1991,17 @@ end
         }, SectionAdd)
 
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4), 
+          CornerRadius = UDim.new(0, 4),
         }, Input)
 
         local InputTitle = Custom:Create("TextLabel", {
           Font = Enum.Font.GothamBold,
           Text = Title,
-          TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-          TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-          TextStrokeTransparency = 0.7,
+          TextColor3 = Color3.fromRGB(230, 230, 230),
           TextSize = 13,
           TextXAlignment = Enum.TextXAlignment.Left,
           TextYAlignment = Enum.TextYAlignment.Top,
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 0.999,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 0,
@@ -1984,13 +2009,6 @@ end
           Size = UDim2.new(1, -180, 0, 13),
           Name = "InputTitle",
         }, Input)
-        
-        Custom:Create("UIStroke", {
-            Color = Color3.fromRGB(255, 255, 255),
-            Thickness = 0.2, 
-            Transparency = 0.5,
-        }, InputTitle)
-
 
         local InputContent = Custom:Create("TextLabel", {
           Font = Enum.Font.GothamBold,
@@ -2001,6 +2019,7 @@ end
           TextWrapped = true,
           TextXAlignment = Enum.TextXAlignment.Left,
           TextYAlignment = Enum.TextYAlignment.Bottom,
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 0.999,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 0,
@@ -2009,12 +2028,6 @@ end
           Name = "InputContent",
           Parent = Input
         })
-        
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.2, 
-            Transparency = 0.6,
-        }, InputContent)
 
         local function UpdateInputSize()
           local Ratio = InputContent.TextBounds.X / InputContent.AbsoluteSize.X
@@ -2035,8 +2048,8 @@ end
 
         local InputFrame = Custom:Create("Frame", {
           AnchorPoint = Vector2.new(1, 0.5),
-          BackgroundColor3 = Custom.FrameDark, -- MODIFIKASI: Input box menjadi gelap
-          BackgroundTransparency = 0.3, -- MODIFIKASI: Transparansi rendah (solid)
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+          BackgroundTransparency = 0.95,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 0,
           ClipsDescendants = true,
@@ -2047,7 +2060,7 @@ end
     
 
         Custom:Create("UICorner", {
-          CornerRadius = UDim.new(0, 4) 
+          CornerRadius = UDim.new(0, 4)
         }, InputFrame)
 
         local InputTextBox = Custom:Create("TextBox", {
@@ -2059,24 +2072,15 @@ end
           TextColor3 = Color3.fromRGB(255, 255, 255),
           TextSize = 12,
           TextXAlignment = Enum.TextXAlignment.Left,
-          -- Posisi yang benar untuk InputTextBox (di tengah vertikal)
-          AnchorPoint = Vector2.new(0, 0.5), 
-          Position = UDim2.new(0, 5, 0.5, 0), -- MODIFIKASI: Ditetapkan ke 0.5, 0 agar di tengah
-          -- End Posisi
-
+          AnchorPoint = Vector2.new(0, 0.5),
+          BackgroundColor3 = Color3.fromRGB(255, 255, 255),
           BackgroundTransparency = 0.999,
           BorderColor3 = Color3.fromRGB(0, 0, 0),
           BorderSizePixel = 0,
+          Position = UDim2.new(0, 5, 0.5, 0),
           Size = UDim2.new(1, -10, 1, -8),
           Name = "InputTextBox"
         }, InputFrame)
-        
-        -- Efek menyala pada teks input
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.5,
-            Transparency = 0.4,
-        }, InputTextBox)
 
         function Funcs_Input:Set(Value)
 					InputTextBox.Text = Value
@@ -2110,8 +2114,8 @@ function Item:AddDropdown(Config)
     local Funcs_Dropdown = {Value = Default, Options = Options}
 
     local Dropdown = Custom:Create("Frame", {
-        BackgroundColor3 = Custom.AccentColor, -- Biru Transparan
-        BackgroundTransparency = 0.85, 
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        BackgroundTransparency = 0.935,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         LayoutOrder = ItemCount,
@@ -2124,6 +2128,7 @@ function Item:AddDropdown(Config)
         Text = "",
         TextColor3 = Color3.fromRGB(0, 0, 0),
         TextSize = 14,
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -2132,18 +2137,17 @@ function Item:AddDropdown(Config)
     }, Dropdown)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 4)
     }, Dropdown)
 
     local DropdownTitle = Custom:Create("TextLabel", {
         Font = Enum.Font.GothamBold,
         Text = Title,
-        TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-        TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-        TextStrokeTransparency = 0.7,
+        TextColor3 = Color3.fromRGB(230, 230, 230),
         TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Top,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -2152,12 +2156,6 @@ function Item:AddDropdown(Config)
         Name = "DropdownTitle",
         Parent = Dropdown
     })
-    
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(255, 255, 255),
-        Thickness = 0.2, 
-        Transparency = 0.5,
-    }, DropdownTitle)
 
     local DropdownContent = Custom:Create("TextLabel", {
         Font = Enum.Font.GothamBold,
@@ -2168,6 +2166,7 @@ function Item:AddDropdown(Config)
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Bottom,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -2177,12 +2176,6 @@ function Item:AddDropdown(Config)
         Parent = Dropdown
     })
     
-    Custom:Create("UIStroke", {
-        Color = Custom.ColorRGB,
-        Thickness = 0.2, 
-        Transparency = 0.6,
-    }, DropdownContent)
-
     DropdownContent.Size = UDim2.new(1, -180, 0, 12 + (12 * (DropdownContent.TextBounds.X // DropdownContent.AbsoluteSize.X)))
     DropdownContent.TextWrapped = true
     Dropdown.Size = UDim2.new(1, 0, 0, DropdownContent.AbsoluteSize.Y + 33)
@@ -2199,8 +2192,8 @@ function Item:AddDropdown(Config)
 
     local SelectOptionsFrame = Custom:Create("Frame", {
         AnchorPoint = Vector2.new(1, 0.5),
-        BackgroundColor3 = Custom.FrameDark, -- MODIFIKASI: Input box menjadi gelap
-        BackgroundTransparency = 0.3, -- MODIFIKASI: Transparansi rendah (solid)
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        BackgroundTransparency = 0.95,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
         Position = UDim2.new(1, -7, 0.5, 0),
@@ -2210,7 +2203,7 @@ function Item:AddDropdown(Config)
     }, Dropdown)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 4)
     }, SelectOptionsFrame)
 
     DropdownButton.Activated:Connect(function()
@@ -2233,34 +2226,25 @@ function Item:AddDropdown(Config)
         Font = Enum.Font.GothamBold,
         Text = "",
         TextColor3 = Color3.fromRGB(255, 255, 255),
-        TextSize = 14,
+        TextSize = 12,
         TextTransparency = 0.6,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
-        
-        -- Posisi yang benar untuk OptionSelecting (di tengah vertikal)
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 5, 0.5, 0), -- MODIFIKASI: Ditetapkan ke 0.5, 0 agar di tengah
-        -- End Posisi
-
+        AnchorPoint = Vector2.new(0, 0.5),
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
+        Position = UDim2.new(0, 5, 0.5, 0),
         Size = UDim2.new(1, -30, 1, -8),
         Name = "OptionSelecting",
     }, SelectOptionsFrame)
-    
-    -- Efek menyala pada teks seleksi
-    Custom:Create("UIStroke", {
-        Color = Custom.ColorRGB,
-        Thickness = 0.5,
-        Transparency = 0.4,
-    }, OptionSelecting)
 
     local OptionImg = Custom:Create("ImageLabel", {
         Image = "rbxassetid://16851841101",
         ImageColor3 = Color3.fromRGB(231, 231, 231),
         AnchorPoint = Vector2.new(1, 0.5),
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -2271,10 +2255,11 @@ function Item:AddDropdown(Config)
 
     local ScrollSelect = Custom:Create("ScrollingFrame", {
         CanvasSize = UDim2.new(0, 0, 0, 0),
-        ScrollBarImageColor3 = Custom.ColorRGB,
+        ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0),
         ScrollBarThickness = 0,
         Active = true,
         LayoutOrder = CountDropdown,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 0.999,
         BorderColor3 = Color3.fromRGB(0, 0, 0),
         BorderSizePixel = 0,
@@ -2290,26 +2275,19 @@ function Item:AddDropdown(Config)
         Text = "",
         TextColor3 = Color3.fromRGB(255, 255, 255),
         TextSize = 12,
-        BackgroundColor3 = Custom.FrameDark, 
+        BackgroundColor3 = Color3.fromRGB(30, 30, 30),
         BackgroundTransparency = 0.3,
         BorderColor3 = Color3.fromRGB(80, 80, 80),
         BorderSizePixel = 1,
         Size = UDim2.new(1, -6, 0, 25),
         Position = UDim2.new(0, 3, 0, 3),
         Name = "SearchBar",
-        LayoutOrder = -1, 
+        LayoutOrder = -1, -- Put search bar at the top
         Parent = ScrollSelect
     })
-    
-    -- Efek menyala pada teks SearchBar
-    Custom:Create("UIStroke", {
-        Color = Custom.ColorRGB,
-        Thickness = 0.5,
-        Transparency = 0.4,
-    }, SearchBar)
 
     Custom:Create("UICorner", {
-        CornerRadius = UDim.new(0, 4) 
+        CornerRadius = UDim.new(0, 4)
     }, SearchBar)
 
     Custom:Create("UIListLayout", {
@@ -2332,14 +2310,12 @@ function Item:AddDropdown(Config)
         
         -- Update canvas size after search
         local function UpdateCanvasSize()
-            task.wait() 
-            local OffsetY = 28 
+            local OffsetY = 28 -- Account for search bar
             for _, child in ipairs(ScrollSelect:GetChildren()) do
                 if child.Name ~= "UIListLayout" and child.Name ~= "SearchBar" and child.Visible then
                     OffsetY = OffsetY + 3 + child.Size.Y.Offset
                 end
             end
-
             ScrollSelect.CanvasSize = UDim2.new(0, 0, 0, OffsetY)
         end
         UpdateCanvasSize()
@@ -2381,7 +2357,6 @@ function Item:AddDropdown(Config)
                             TweenService:Create(stroke, tweenInfoInOut, {Transparency = Transparency}):Play()
                         end
                     end
-                    Drop.BackgroundColor3 = isTextFound and Custom.AccentColor or Color3.fromRGB(255, 255, 255) 
                     TweenService:Create(Drop, tweenInfoInOut, {BackgroundTransparency = BackgroundTransparency}):Play()
                 end
             end
@@ -2409,11 +2384,11 @@ function Item:AddDropdown(Config)
             LayoutOrder = DropCount,
             Size = UDim2.new(1, 0, 0, 30),
             Name = "Option",
-            Visible = true 
+            Visible = true -- Ensure options are visible by default
         }, ScrollSelect)
 
         Custom:Create("UICorner", {
-            CornerRadius = UDim.new(0, 4) 
+            CornerRadius = UDim.new(0, 3)
         }, Option)
 
         local OptionButton = Custom:Create("TextButton", {
@@ -2422,6 +2397,7 @@ function Item:AddDropdown(Config)
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BackgroundTransparency = 0.999,
             BorderColor3 = Color3.fromRGB(0, 0, 0),
             BorderSizePixel = 0,
@@ -2432,10 +2408,8 @@ function Item:AddDropdown(Config)
         local OptionText = Custom:Create("TextLabel", {
             Font = Enum.Font.GothamBold,
             Text = OptionName,
-			TextSize = 14,
-            TextColor3 = Color3.fromRGB(255, 255, 255), -- Putih nyala
-            TextStrokeColor3 = Color3.fromRGB(20, 20, 20),
-            TextStrokeTransparency = 0.7,
+            TextSize = 13,
+            TextColor3 = Color3.fromRGB(230, 230, 230),
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Center,
             BackgroundTransparency = 1,
@@ -2443,12 +2417,6 @@ function Item:AddDropdown(Config)
             Size = UDim2.new(1, -16, 1, 0),
             Name = "OptionText"
         }, Option)
-        
-        Custom:Create("UIStroke", {
-            Color = Custom.ColorRGB,
-            Thickness = 0.2, 
-            Transparency = 0.6,
-        }, OptionText)
 
         local ChooseFrame = Custom:Create("Frame", {
             AnchorPoint = Vector2.new(0, 0.5),
@@ -2466,7 +2434,7 @@ function Item:AddDropdown(Config)
             Transparency = 0.999
         }, ChooseFrame)
 
-        Custom:Create("UICorner", {CornerRadius = UDim.new(0, 4)}, ChooseFrame) 
+        Custom:Create("UICorner", {}, ChooseFrame)
 
         OptionButton.Activated:Connect(function()
             CircleClick(OptionButton, Player:GetMouse().X, Player:GetMouse().Y)
@@ -2495,8 +2463,9 @@ function Item:AddDropdown(Config)
     
         -- Update canvas size function - Fixed
         local function UpdateCanvasSize()
-            task.wait() 
-            local OffsetY = 28 
+            task.wait() -- Small delay to ensure layout has updated
+            local OffsetY = 28 -- Account for search bar height + padding
+            
             for _, child in ipairs(ScrollSelect:GetChildren()) do
                 if child.Name ~= "UIListLayout" and child.Name ~= "SearchBar" and child.Visible then
                     OffsetY = OffsetY + 3 + child.Size.Y.Offset
