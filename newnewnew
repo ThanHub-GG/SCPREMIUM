@@ -758,6 +758,16 @@ function Speed_Library:CreateWindow(Config)
         SortOrder = Enum.SortOrder.LayoutOrder
     }, ScrollTab)
 
+	local SearchResultPage = Custom:Create("ScrollingFrame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		Visible = false,
+		Name = "SearchResultPage",
+		Parent = LayersReal -- Sejajar sama Tab-Tab lain
+	})
+
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 5) }, SearchResultPage)
+
 	local SearchFrame = Custom:Create("Frame", {
 		BackgroundColor3 = Custom.BackgroundDark,
 		BackgroundTransparency = 0.5,
@@ -2126,45 +2136,64 @@ end
 				return Funcs_Input
       end
 
+local LastTab = nil -- Buat ngetrack Tab mana yang dibuka sebelum nyari
+
 SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
     local InputText = SearchInput.Text:lower()
     
-    -- Kita cari di dalam LayersReal (tempat page/tab kamu kumpul)
-    for _, Page in pairs(LayersFolder:GetChildren()) do
-        if Page:IsA("ScrollingFrame") or Page:IsA("Frame") then
-            
-            -- Masuk ke tiap Section di dalam Tab tersebut
-            for _, Section in pairs(Page:GetChildren()) do
-                if Section.Name == "Section" then
-                    local SectionAdd = Section:FindFirstChild("SectionAdd")
-                    local SectionHasVisibleFeature = false
-                    
-                    if SectionAdd then
-                        -- Cek fitur (Button, Toggle, dll)
-                        for _, Feature in pairs(SectionAdd:GetChildren()) do
-                            local FeatureTitle = Feature:FindFirstChildWhichIsA("TextLabel", true)
-                            
-                            if FeatureTitle then
-                                if InputText == "" or string.find(FeatureTitle.Text:lower(), InputText) then
+    if InputText ~= "" then
+        -- Simpan Tab terakhir kalau belum ada
+        if not SearchResultPage.Visible then
+            LastTab = LayersPageLayout.CurrentPage
+            SearchResultPage.Visible = true
+        end
+        
+        -- Bersihkan hasil lama
+        for _, old in pairs(SearchResultPage:GetChildren()) do
+            if not old:IsA("UIListLayout") then old.Parent = old:GetAttribute("OriginalParent") end
+        end
+
+        -- Cari di SEMUA Tab
+        for _, Page in pairs(LayersFolder:GetChildren()) do
+            if Page:IsA("ScrollingFrame") and Page ~= SearchResultPage then
+                Page.Visible = false -- Sembunyiin Tab asli
+                
+                for _, Section in pairs(Page:GetChildren()) do
+                    if Section.Name == "Section" then
+                        local SectionAdd = Section:FindFirstChild("SectionAdd")
+                        if SectionAdd then
+                            for _, Feature in pairs(SectionAdd:GetChildren()) do
+                                local Title = Feature:FindFirstChildWhichIsA("TextLabel", true)
+                                if Title and string.find(Title.Text:lower(), InputText) then
+                                    -- Pinjam fiturnya sebentar ke SearchResultPage
+                                    if not Feature:GetAttribute("OriginalParent") then
+                                        Feature:SetAttribute("OriginalParent", Feature.Parent)
+                                    end
+                                    Feature.Parent = SearchResultPage
                                     Feature.Visible = true
-                                    SectionHasVisibleFeature = true
-                                else
-                                    Feature.Visible = false
                                 end
                             end
                         end
                     end
-                    
-                    -- Sembunyikan section kalau isinya nggak ada yang cocok
-                    Section.Visible = (InputText == "" or SectionHasVisibleFeature)
                 end
             end
         end
+    else
+        -- KALAU KOSONG: Balikin semua fitur ke tempat asalnya
+        for _, Feature in pairs(SearchResultPage:GetChildren()) do
+            if not Feature:IsA("UIListLayout") then
+                Feature.Parent = Feature:GetAttribute("OriginalParent")
+            end
+        end
+        
+        SearchResultPage.Visible = false
+        if LastTab then
+            LastTab.Visible = true
+            LayersPageLayout:JumpTo(LastTab)
+        end
     end
-    
-    -- Panggil update scroll biar sizenya nyesuaiin yang visible aja
-    UpdateSize() 
 end)
+
 function Item:AddDropdown(Config)
     local Title = Config[1] or Config.Title or ""
     local Content = Config[2] or Config.Content or ""
