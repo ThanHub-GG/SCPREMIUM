@@ -742,6 +742,63 @@ function Speed_Library:CreateWindow(Config)
         ScrollTab.CanvasSize = UDim2.new(0, 0, 0, _Total)
     end
 
+-- Background gelap transparan buat nutupin seluruh UI pas konfirmasi muncul
+local ConfirmOverlay = Custom:Create("Frame", {
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+    BackgroundTransparency = 1, -- Defaultnya sembunyi
+    Visible = false,
+    ZIndex = 10,
+    Name = "ConfirmOverlay"
+}, Main) -- Masukin ke Main frame kamu
+
+-- Kotak Dialog Tengah
+local ConfirmFrame = Custom:Create("Frame", {
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    BackgroundColor3 = Custom.FrameDark,
+    Position = UDim2.new(0.5, 0, 0.5, 0),
+    Size = UDim2.new(0, 220, 0, 120),
+    Name = "ConfirmFrame",
+    Parent = ConfirmOverlay
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, ConfirmFrame)
+Custom:Create("UIStroke", {Color = Custom.ColorRGB, Thickness = 1.5, Transparency = 0.5}, ConfirmFrame)
+
+-- Tulisan Pertanyaan
+local ConfirmTitle = Custom:Create("TextLabel", {
+    Text = "Close ThanHub?",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 14,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 40),
+    Parent = ConfirmFrame
+})
+
+-- Tombol Cancel (Batal)
+local CancelBtn = Custom:Create("TextButton", {
+    Text = "Cancel",
+    Font = Enum.Font.Gotham,
+    TextColor3 = Color3.fromRGB(200, 200, 200),
+    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
+    Position = UDim2.new(0, 15, 0, 65),
+    Size = UDim2.new(0, 90, 0, 35),
+    Parent = ConfirmFrame
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, CancelBtn)
+
+-- Tombol Confirm (Tutup)
+local ConfirmBtn = Custom:Create("TextButton", {
+    Text = "Close",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    BackgroundColor3 = Color3.fromRGB(200, 50, 50),
+    Position = UDim2.new(0, 115, 0, 65),
+    Size = UDim2.new(0, 90, 0, 35),
+    Parent = ConfirmFrame
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, ConfirmBtn)
+
     ScrollTab.ChildAdded:Connect(UpdateSize)
     ScrollTab.ChildRemoved:Connect(UpdateSize)
 
@@ -764,11 +821,26 @@ Open_Close.Activated:Connect(function()
     Open_Close.Visible = false
 end)
 
-    -- Close Function
-    RedButton.Activated:Connect(function()
-        if SpeedHubXGui then SpeedHubXGui:Destroy() end
-        if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
+-- Munculkan Overlay pas tombol X diklik
+RedButton.Activated:Connect(function()
+    ConfirmOverlay.Visible = true
+    TweenService:Create(ConfirmOverlay, TweenInfo.new(0.2), {BackgroundTransparency = 0.5}):Play()
+end)
+
+-- Kalau user pilih Cancel (Batal)
+CancelBtn.Activated:Connect(function()
+    local t = TweenService:Create(ConfirmOverlay, TweenInfo.new(0.2), {BackgroundTransparency = 1})
+    t:Play()
+    t.Completed:Connect(function()
+        ConfirmOverlay.Visible = false
     end)
+end)
+
+-- Kalau user pilih Close (Konfirmasi Tutup)
+ConfirmBtn.Activated:Connect(function()
+    if SpeedHubXGui then SpeedHubXGui:Destroy() end
+    if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
+end)
 
     -- Simple Hover Effects
     local function AddHover(btn, hoverColor)
