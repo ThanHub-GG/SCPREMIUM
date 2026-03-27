@@ -758,6 +758,34 @@ function Speed_Library:CreateWindow(Config)
         SortOrder = Enum.SortOrder.LayoutOrder
     }, ScrollTab)
 
+	local SearchFrame = Custom:Create("Frame", {
+		BackgroundColor3 = Custom.BackgroundDark,
+		BackgroundTransparency = 0.5,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, -10, 0, 30),
+		Position = UDim2.new(0, 5, 0, 5), -- Kasih margin dikit
+		Name = "SearchFrame",
+		Parent = ScrollTab -- Masukin ke scrollbar biar ikut gerak atau LayersTab biar diem
+	})
+
+	local SearchInput = Custom:Create("TextBox", {
+		Font = Enum.Font.Gotham,
+		Text = "",
+		PlaceholderText = "Search features...",
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
+		TextSize = 12,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -10, 1, 0),
+		Position = UDim2.new(0, 10, 0, 0),
+		Name = "SearchInput",
+		Parent = SearchFrame
+	})
+
+	-- Tambahkan UI Corner biar estetik mac-style
+	Custom:Create("UICorner", { CornerRadius = UDim.new(0, 6) }, SearchFrame)
+
     local function UpdateSize()
         local _Total = 0
 
@@ -977,33 +1005,6 @@ function Speed_Library:CreateWindow(Config)
             Padding = UDim.new(0, 4),
             SortOrder = Enum.SortOrder.LayoutOrder,
         }, ScrolLayers)
-
-		local SearchFrame = Custom:Create("Frame", {
-			BackgroundColor3 = Custom.BackgroundDark,
-			BackgroundTransparency = 0.5,
-			BorderSizePixel = 0,
-			Size = UDim2.new(1, -10, 0, 30),
-			Name = "SearchFrame",
-			Parent = ScrolLayers
-		})
-
-		Custom:Create("UICorner", { CornerRadius = UDim.new(0, 6) }, SearchFrame)
-		Custom:Create("UIStroke", { Color = Custom.ColorRGB, Thickness = 0.8, Transparency = 0.5 }, SearchFrame)
-
-		local SearchInput = Custom:Create("TextBox", {
-			Font = Enum.Font.Gotham,
-			Text = "",
-			PlaceholderText = "Search features...",
-			TextColor3 = Color3.fromRGB(255, 255, 255),
-			PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
-			TextSize = 12,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -10, 1, 0),
-			Position = UDim2.new(0, 10, 0, 0),
-			Name = "SearchInput",
-			Parent = SearchFrame
-		})
 
         local Tab = Custom:Create("Frame", {
             BackgroundColor3 = CountTab == 0 and Custom.FrameDark or Custom.BackgroundDark,
@@ -1374,54 +1375,6 @@ local function ToggleSection()
         UpdateSizeScroll()
     end
 end
-
-SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
-    local InputText = SearchInput.Text:lower()
-    
-    for _, Section in pairs(ScrolLayers:GetChildren()) do
-        -- 1. Cari elemen yang namanya "Section" (lewatkan SearchFrame/UIListLayout)
-        if Section:IsA("Frame") and Section.Name == "Section" then
-            local SectionAdd = Section:FindFirstChild("SectionAdd")
-            local SectionHasVisibleFeature = false
-            
-            if SectionAdd then
-                -- 2. Loop semua fitur di dalam SectionAdd (Toggle, Button, dll)
-                for _, Feature in pairs(SectionAdd:GetChildren()) do
-                    if Feature:IsA("Frame") or Feature:IsA("TextButton") then
-                        -- Cari judul fitur (biasanya TextLabel)
-                        local FeatureTitle = Feature:FindFirstChildWhichIsA("TextLabel", true)
-                        
-                        if FeatureTitle then
-                            if InputText == "" or string.find(FeatureTitle.Text:lower(), InputText) then
-                                Feature.Visible = true
-                                SectionHasVisibleFeature = true
-                            else
-                                Feature.Visible = false
-                            end
-                        end
-                    end
-                end
-            end
-            
-            -- 3. Logic Penampilan Section
-            if InputText == "" then
-                Section.Visible = true
-                -- Opsional: Kembalikan ke state OpenSection asli kalau search dihapus
-            else
-                -- Sembunyikan Section kalau isinya gak ada yang cocok sama sekali
-                Section.Visible = SectionHasVisibleFeature
-                
-                -- AUTO OPEN: Kalau ada fitur yang cocok, paksa section terbuka biar kelihatan
-                if SectionHasVisibleFeature and not OpenSection then
-                    -- Kamu bisa panggil fungsi ToggleSection() di sini kalau mau otomatis kebuka
-                end
-            end
-        end
-    end
-    
-    -- 4. Update Canvas Scroll biar gak ada ruang kosong di bawah
-    UpdateSizeScroll() 
-end)
 
       SectionButton.Activated:Connect(ToggleSection)
       SectionAdd.ChildAdded:Connect(UpdateSizeSection)
@@ -2173,6 +2126,45 @@ end
 				return Funcs_Input
       end
 
+SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
+    local InputText = SearchInput.Text:lower()
+    
+    -- Kita cari di dalam LayersReal (tempat page/tab kamu kumpul)
+    for _, Page in pairs(LayersFolder:GetChildren()) do
+        if Page:IsA("ScrollingFrame") or Page:IsA("Frame") then
+            
+            -- Masuk ke tiap Section di dalam Tab tersebut
+            for _, Section in pairs(Page:GetChildren()) do
+                if Section.Name == "Section" then
+                    local SectionAdd = Section:FindFirstChild("SectionAdd")
+                    local SectionHasVisibleFeature = false
+                    
+                    if SectionAdd then
+                        -- Cek fitur (Button, Toggle, dll)
+                        for _, Feature in pairs(SectionAdd:GetChildren()) do
+                            local FeatureTitle = Feature:FindFirstChildWhichIsA("TextLabel", true)
+                            
+                            if FeatureTitle then
+                                if InputText == "" or string.find(FeatureTitle.Text:lower(), InputText) then
+                                    Feature.Visible = true
+                                    SectionHasVisibleFeature = true
+                                else
+                                    Feature.Visible = false
+                                end
+                            end
+                        end
+                    end
+                    
+                    -- Sembunyikan section kalau isinya nggak ada yang cocok
+                    Section.Visible = (InputText == "" or SectionHasVisibleFeature)
+                end
+            end
+        end
+    end
+    
+    -- Panggil update scroll biar sizenya nyesuaiin yang visible aja
+    UpdateSize() 
+end)
 function Item:AddDropdown(Config)
     local Title = Config[1] or Config.Title or ""
     local Content = Config[2] or Config.Content or ""
