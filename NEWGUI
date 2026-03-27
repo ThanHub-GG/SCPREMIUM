@@ -365,7 +365,8 @@ function Speed_Library:SetNotification(Config)
         TextWrapped=true
     })
 
-    TextLabel2.Size = UDim2.new(1,-20,0,13+(13*(TextLabel2.TextBounds.X//TextLabel2.AbsoluteSize.X)))
+	local lines = math.ceil(TextLabel2.TextBounds.X / TextLabel2.AbsoluteSize.X)
+	TextLabel2.Size = UDim2.new(1, -20, 0, 13 + (13 * lines))
 
     if TextLabel2.AbsoluteSize.Y < 27 then
         NotificationFrame.Size = UDim2.new(1,0,0,65)
@@ -414,7 +415,7 @@ function Speed_Library:CreateWindow(Config)
         Size = UDim2.new(0, 455, 0, 350),
         ZIndex = 0,
         Name = generateRandomString(12),
-        Position = UDim2.new(0, (SpeedHubXGui.AbsoluteSize.X // 2 - 455 // 2), 0, (SpeedHubXGui.AbsoluteSize.Y // 2 - 350 // 2))
+        Position = UDim2.new(0, math.floor(SpeedHubXGui.AbsoluteSize.X / 2 - 455 / 2), 0, math.floor(SpeedHubXGui.AbsoluteSize.Y / 2 - 350 / 2))
     }, SpeedHubXGui)
 
     local DropShadow = Custom:Create("ImageLabel", {
@@ -479,112 +480,46 @@ function Speed_Library:CreateWindow(Config)
         Rotation = 90,
     }, Top)
 
-    -- macOS/Linux Terminal Style Buttons Container (Kiri untuk Hijau)
-    local TweenService = game:GetService("TweenService")
-
-    local GreenButtonContainer = Custom:Create("Frame", {
+-- Control Buttons Container (Hapus semua kode GreenButton & Mac logic)
+    local Controls = Custom:Create("Frame", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 12, 0, 0),
-        Size = UDim2.new(0, 12, 1, 0),
-        Name = "GreenButtonContainer"
+        AnchorPoint = Vector2.new(1, 0.5),
+        Position = UDim2.new(1, -10, 0.5, 0),
+        Size = UDim2.new(0, 70, 0, 30),
+        Name = "Controls"
     }, Top)
 
-    local GreenButton = Custom:Create("Frame", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 59, 48),
-        Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Name = "GreenButton"
-    }, GreenButtonContainer)
+    local UIListLayoutControls = Custom:Create("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
+        VerticalAlignment = Enum.VerticalAlignment.Center,
+        Padding = UDim.new(0, 5),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    }, Controls)
 
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, GreenButton)
-
-    local Stroke = Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 40, 30),
-        Thickness = 1,
-        Transparency = 0.3
-    }, GreenButton)
-
-    local tweenInfo = TweenInfo.new(
-        3,
-        Enum.EasingStyle.Quad,
-        Enum.EasingDirection.InOut
-    )
-
-    local buttonTween = TweenService:Create(GreenButton, tweenInfo, {
-        BackgroundColor3 = Custom.MacGreenButton
-    })
-    local strokeTween = TweenService:Create(Stroke, tweenInfo, {
-        Color = Color3.fromRGB(30, 150, 50)
-    })
-    buttonTween:Play()
-    strokeTween:Play()
-
-    local RightButtonsContainer = Custom:Create("Frame", {
-        BackgroundTransparency = 1,
-        AnchorPoint = Vector2.new(1, 0),
-        Position = UDim2.new(1, -12, 0, 0),
-        Size = UDim2.new(0, 52, 1, 0),
-        Name = "RightButtonsContainer"
-    }, Top)
-
-    local GreenButton2 = Custom:Create("Frame", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacGreenButton,
-        Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Name = "GreenButton2"
-    }, RightButtonsContainer)
-
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, GreenButton2)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(30, 150, 50),
-        Thickness = 1,
-        Transparency = 0.3
-    }, GreenButton2)
-
+    -- Button Minimize (-)
     local YellowButton = Custom:Create("TextButton", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacYellowButton,
-        Position = UDim2.new(0, 20, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Text = "",
-        Name = "YellowButton"
-    }, RightButtonsContainer)
+        Name = "Minimize",
+        LayoutOrder = 1,
+        Size = UDim2.new(0, 25, 0, 25),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = "—", 
+        TextColor3 = Color3.fromRGB(200, 200, 200),
+        TextSize = 14
+    }, Controls)
 
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, YellowButton)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 150, 50),
-        Thickness = 1,
-        Transparency = 0.3
-    }, YellowButton)
-
+    -- Button Close (X)
     local RedButton = Custom:Create("TextButton", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacRedButton,
-        Position = UDim2.new(0, 40, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Text = "",
-        Name = "RedButton"
-    }, RightButtonsContainer)
-
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, RedButton)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 70, 60),
-        Thickness = 1,
-        Transparency = 0.3
-    }, RedButton)
+        Name = "Close",
+        LayoutOrder = 2,
+        Size = UDim2.new(0, 25, 0, 25),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = "X",
+        TextColor3 = Color3.fromRGB(200, 200, 200),
+        TextSize = 16
+    }, Controls)
 
     local TextLabel = Custom:Create("TextLabel", {
         Font = Enum.Font.GothamBold,
@@ -757,6 +692,44 @@ function Speed_Library:CreateWindow(Config)
         SortOrder = Enum.SortOrder.LayoutOrder
     }, ScrollTab)
 
+	local SearchResultPage = Custom:Create("ScrollingFrame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		Visible = false,
+		Name = "SearchResultPage",
+		Parent = LayersReal -- Sejajar sama Tab-Tab lain
+	})
+
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 5) }, SearchResultPage)
+
+	local SearchFrame = Custom:Create("Frame", {
+		BackgroundColor3 = Custom.BackgroundDark,
+		BackgroundTransparency = 0.5,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, -10, 0, 30),
+		Position = UDim2.new(0, 5, 0, 5), -- Kasih margin dikit
+		Name = "SearchFrame",
+		Parent = ScrollTab -- Masukin ke scrollbar biar ikut gerak atau LayersTab biar diem
+	})
+
+	local SearchInput = Custom:Create("TextBox", {
+		Font = Enum.Font.Gotham,
+		Text = "",
+		PlaceholderText = "Search features...",
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
+		TextSize = 12,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, -10, 1, 0),
+		Position = UDim2.new(0, 10, 0, 0),
+		Name = "SearchInput",
+		Parent = SearchFrame
+	})
+
+	-- Tambahkan UI Corner biar estetik mac-style
+	Custom:Create("UICorner", { CornerRadius = UDim.new(0, 6) }, SearchFrame)
+
     local function UpdateSize()
         local _Total = 0
 
@@ -769,51 +742,118 @@ function Speed_Library:CreateWindow(Config)
         ScrollTab.CanvasSize = UDim2.new(0, 0, 0, _Total)
     end
 
+-- Background gelap transparan buat nutupin seluruh UI pas konfirmasi muncul
+local ConfirmOverlay = Custom:Create("Frame", {
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+    BackgroundTransparency = 1, -- Defaultnya sembunyi
+    Visible = false,
+    ZIndex = 10,
+    Name = "ConfirmOverlay"
+}, Main) -- Masukin ke Main frame kamu
+
+-- Kotak Dialog Tengah
+local ConfirmFrame = Custom:Create("Frame", {
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    BackgroundColor3 = Custom.FrameDark,
+    Position = UDim2.new(0.5, 0, 0.5, 0),
+    Size = UDim2.new(0, 220, 0, 120),
+    Name = "ConfirmFrame",
+    Parent = ConfirmOverlay
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 8)}, ConfirmFrame)
+Custom:Create("UIStroke", {Color = Custom.ColorRGB, Thickness = 1.5, Transparency = 0.5}, ConfirmFrame)
+
+-- Tulisan Pertanyaan
+local ConfirmTitle = Custom:Create("TextLabel", {
+    Text = "Close ThanHub?",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 14,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 40),
+    Parent = ConfirmFrame
+})
+
+-- Tombol Cancel (Batal)
+local CancelBtn = Custom:Create("TextButton", {
+    Text = "Cancel",
+    Font = Enum.Font.Gotham,
+    TextColor3 = Color3.fromRGB(200, 200, 200),
+    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
+    Position = UDim2.new(0, 15, 0, 65),
+    Size = UDim2.new(0, 90, 0, 35),
+    Parent = ConfirmFrame
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, CancelBtn)
+
+-- Tombol Confirm (Tutup)
+local ConfirmBtn = Custom:Create("TextButton", {
+    Text = "Close",
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    BackgroundColor3 = Color3.fromRGB(200, 50, 50),
+    Position = UDim2.new(0, 115, 0, 65),
+    Size = UDim2.new(0, 90, 0, 35),
+    Parent = ConfirmFrame
+})
+Custom:Create("UICorner", {CornerRadius = UDim.new(0, 6)}, ConfirmBtn)
+
     ScrollTab.ChildAdded:Connect(UpdateSize)
     ScrollTab.ChildRemoved:Connect(UpdateSize)
 
-    -- Yellow Button (Minimize) functionality
-    YellowButton.Activated:Connect(function()
-        -- Hover effect
-        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
-        task.wait(0.1)
-        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Custom.MacYellowButton}):Play()
-        
-        DropShadowHolder.Visible = false
-        if not Open_Close.Visible then Open_Close.Visible = true end
-    end)
+-- Yellow Button (Minimize)
+	YellowButton.Activated:Connect(function()
+		-- Sembunyikan UI Utama (ThanHub)
+		DropShadowHolder.Visible = false
+		
+		-- Munculkan tombol floating untuk buka lagi
+		if Open_Close then 
+			Open_Close.Visible = true 
+		end
+	end)
 
-    Open_Close.Activated:Connect(function()
-        DropShadowHolder.Visible = true
-        if Open_Close.Visible then Open_Close.Visible = false end
-    end)
+Open_Close.Activated:Connect(function()
+    -- Munculkan lagi UI Utama
+    DropShadowHolder.Visible = true
+    
+    -- Sembunyikan tombol floating
+    Open_Close.Visible = false
+end)
 
-    -- Red Button (Close) functionality
-    RedButton.Activated:Connect(function()
-        -- Hover effect
-        TweenService:Create(RedButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
-        task.wait(0.1)
-        
-        if SpeedHubXGui then SpeedHubXGui:Destroy() end
-        if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
-    end)
+-- Munculkan Overlay pas tombol X diklik
+RedButton.Activated:Connect(function()
+    ConfirmOverlay.Visible = true
+    TweenService:Create(ConfirmOverlay, TweenInfo.new(0.2), {BackgroundTransparency = 0.5}):Play()
+end)
 
-    -- Hover effects for mac buttons
-    RedButton.MouseEnter:Connect(function()
-        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
+-- Kalau user pilih Cancel (Batal)
+CancelBtn.Activated:Connect(function()
+    local t = TweenService:Create(ConfirmOverlay, TweenInfo.new(0.2), {BackgroundTransparency = 1})
+    t:Play()
+    t.Completed:Connect(function()
+        ConfirmOverlay.Visible = false
     end)
+end)
 
-    RedButton.MouseLeave:Connect(function()
-        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacRedButton}):Play()
-    end)
+-- Kalau user pilih Close (Konfirmasi Tutup)
+ConfirmBtn.Activated:Connect(function()
+    if SpeedHubXGui then SpeedHubXGui:Destroy() end
+    if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
+end)
 
-    YellowButton.MouseEnter:Connect(function()
-        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
-    end)
+    -- Simple Hover Effects
+    local function AddHover(btn, hoverColor)
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = hoverColor}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
+        end)
+    end
 
-    YellowButton.MouseLeave:Connect(function()
-        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacYellowButton}):Play()
-    end)
+    AddHover(YellowButton, Color3.fromRGB(255, 200, 0)) -- Kuning pas hover
+    AddHover(RedButton, Color3.fromRGB(255, 50, 50))    -- Merah pas hover
 
     DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
     MakeDraggable(Top, DropShadowHolder)
@@ -1130,7 +1170,7 @@ function Speed_Library:CreateWindow(Config)
                 TweenService:Create(FrameChoose, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 2, 0, 16)}):Play()
             end
         end)
-
+		
         local Sections, CountSection = {}, 0
 
         function Sections:AddSection(Title, OpenSection)
@@ -1347,7 +1387,6 @@ local function ToggleSection()
     end
 end
 
-    
       SectionButton.Activated:Connect(ToggleSection)
       SectionAdd.ChildAdded:Connect(UpdateSizeSection)
       SectionAdd.ChildRemoved:Connect(UpdateSizeSection)
@@ -1566,7 +1605,7 @@ end
 				}, Button)
 
         local function UpdateButtonSize()
-          local _Height = 12 + (12 * (ButtonContent.TextBounds.X // ButtonContent.AbsoluteSize.X))
+          local _Height = 12 + (12 * math.floor(ButtonContent.TextBounds.X / ButtonContent.AbsoluteSize.X))
           ButtonContent.Size = UDim2.new(1, -100, 0, _Height)
           
           Button.Size = UDim2.new(1, 0, 0, ButtonContent.AbsoluteSize.Y + 33)
@@ -2098,6 +2137,64 @@ end
 				return Funcs_Input
       end
 
+local LastTab = nil -- Buat ngetrack Tab mana yang dibuka sebelum nyari
+
+SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
+    local InputText = SearchInput.Text:lower()
+    
+    if InputText ~= "" then
+        -- Simpan Tab terakhir kalau belum ada
+        if not SearchResultPage.Visible then
+            LastTab = LayersPageLayout.CurrentPage
+            SearchResultPage.Visible = true
+        end
+        
+        -- Bersihkan hasil lama
+        for _, old in pairs(SearchResultPage:GetChildren()) do
+            if not old:IsA("UIListLayout") then old.Parent = old:GetAttribute("OriginalParent") end
+        end
+
+        -- Cari di SEMUA Tab
+        for _, Page in pairs(LayersFolder:GetChildren()) do
+            if Page:IsA("ScrollingFrame") and Page ~= SearchResultPage then
+                Page.Visible = false -- Sembunyiin Tab asli
+                
+                for _, Section in pairs(Page:GetChildren()) do
+                    if Section.Name == "Section" then
+                        local SectionAdd = Section:FindFirstChild("SectionAdd")
+                        if SectionAdd then
+                            for _, Feature in pairs(SectionAdd:GetChildren()) do
+                                local Title = Feature:FindFirstChildWhichIsA("TextLabel", true)
+                                if Title and string.find(Title.Text:lower(), InputText) then
+                                    -- Pinjam fiturnya sebentar ke SearchResultPage
+                                    if not Feature:GetAttribute("OriginalParent") then
+                                        Feature:SetAttribute("OriginalParent", Feature.Parent)
+                                    end
+                                    Feature.Parent = SearchResultPage
+                                    Feature.Visible = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        -- KALAU KOSONG: Balikin semua fitur ke tempat asalnya
+        for _, Feature in pairs(SearchResultPage:GetChildren()) do
+            if not Feature:IsA("UIListLayout") then
+                Feature.Parent = Feature:GetAttribute("OriginalParent")
+            end
+        end
+        
+        SearchResultPage.Visible = false
+        if LastTab then
+            LastTab.Visible = true
+            LayersPageLayout:JumpTo(LastTab)
+        end
+    end
+end)
+
 function Item:AddDropdown(Config)
     local Title = Config[1] or Config.Title or ""
     local Content = Config[2] or Config.Content or ""
@@ -2176,14 +2273,14 @@ function Item:AddDropdown(Config)
         Parent = Dropdown
     })
     
-    DropdownContent.Size = UDim2.new(1, -180, 0, 12 + (12 * (DropdownContent.TextBounds.X // DropdownContent.AbsoluteSize.X)))
+    DropdownContent.Size = UDim2.new(1, -180, 0, 12 + (12 * math.floor(DropdownContent.TextBounds.X / DropdownContent.AbsoluteSize.X)))
     DropdownContent.TextWrapped = true
     Dropdown.Size = UDim2.new(1, 0, 0, DropdownContent.AbsoluteSize.Y + 33)
     
     DropdownContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
         DropdownContent.TextWrapped = false
         
-        DropdownContent.Size = UDim2.new(1, -180, 0, 12 + (12 * (DropdownContent.TextBounds.X // DropdownContent.AbsoluteSize.X)))
+        DropdownContent.Size = UDim2.new(1, -180, 0, 12 + (12 * math.ceil(DropdownContent.TextBounds.X / DropdownContent.AbsoluteSize.X)))
         Dropdown.Size = UDim2.new(1, 0, 0, DropdownContent.AbsoluteSize.Y + 33)
         
         DropdownContent.TextWrapped = true
