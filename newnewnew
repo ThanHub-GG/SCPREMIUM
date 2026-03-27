@@ -480,112 +480,46 @@ function Speed_Library:CreateWindow(Config)
         Rotation = 90,
     }, Top)
 
-    -- macOS/Linux Terminal Style Buttons Container (Kiri untuk Hijau)
-    local TweenService = game:GetService("TweenService")
-
-    local GreenButtonContainer = Custom:Create("Frame", {
+-- Control Buttons Container (Hapus semua kode GreenButton & Mac logic)
+    local Controls = Custom:Create("Frame", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 12, 0, 0),
-        Size = UDim2.new(0, 12, 1, 0),
-        Name = "GreenButtonContainer"
+        AnchorPoint = Vector2.new(1, 0.5),
+        Position = UDim2.new(1, -10, 0.5, 0),
+        Size = UDim2.new(0, 70, 0, 30),
+        Name = "Controls"
     }, Top)
 
-    local GreenButton = Custom:Create("Frame", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Color3.fromRGB(255, 59, 48),
-        Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Name = "GreenButton"
-    }, GreenButtonContainer)
+    local UIListLayoutControls = Custom:Create("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
+        VerticalAlignment = Enum.VerticalAlignment.Center,
+        Padding = UDim.new(0, 5),
+        SortOrder = Enum.SortOrder.LayoutOrder
+    }, Controls)
 
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, GreenButton)
-
-    local Stroke = Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 40, 30),
-        Thickness = 1,
-        Transparency = 0.3
-    }, GreenButton)
-
-    local tweenInfo = TweenInfo.new(
-        3,
-        Enum.EasingStyle.Quad,
-        Enum.EasingDirection.InOut
-    )
-
-    local buttonTween = TweenService:Create(GreenButton, tweenInfo, {
-        BackgroundColor3 = Custom.MacGreenButton
-    })
-    local strokeTween = TweenService:Create(Stroke, tweenInfo, {
-        Color = Color3.fromRGB(30, 150, 50)
-    })
-    buttonTween:Play()
-    strokeTween:Play()
-
-    local RightButtonsContainer = Custom:Create("Frame", {
-        BackgroundTransparency = 1,
-        AnchorPoint = Vector2.new(1, 0),
-        Position = UDim2.new(1, -12, 0, 0),
-        Size = UDim2.new(0, 52, 1, 0),
-        Name = "RightButtonsContainer"
-    }, Top)
-
-    local GreenButton2 = Custom:Create("Frame", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacGreenButton,
-        Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Name = "GreenButton2"
-    }, RightButtonsContainer)
-
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, GreenButton2)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(30, 150, 50),
-        Thickness = 1,
-        Transparency = 0.3
-    }, GreenButton2)
-
+    -- Button Minimize (-)
     local YellowButton = Custom:Create("TextButton", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacYellowButton,
-        Position = UDim2.new(0, 20, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Text = "",
-        Name = "YellowButton"
-    }, RightButtonsContainer)
+        Name = "Minimize",
+        LayoutOrder = 1,
+        Size = UDim2.new(0, 25, 0, 25),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = "—", 
+        TextColor3 = Color3.fromRGB(200, 200, 200),
+        TextSize = 14
+    }, Controls)
 
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, YellowButton)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 150, 50),
-        Thickness = 1,
-        Transparency = 0.3
-    }, YellowButton)
-
+    -- Button Close (X)
     local RedButton = Custom:Create("TextButton", {
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Custom.MacRedButton,
-        Position = UDim2.new(0, 40, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
-        Text = "",
-        Name = "RedButton"
-    }, RightButtonsContainer)
-
-    Custom:Create("UICorner", {
-        CornerRadius = UDim.new(1, 0)
-    }, RedButton)
-
-    Custom:Create("UIStroke", {
-        Color = Color3.fromRGB(200, 70, 60),
-        Thickness = 1,
-        Transparency = 0.3
-    }, RedButton)
+        Name = "Close",
+        LayoutOrder = 2,
+        Size = UDim2.new(0, 25, 0, 25),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamBold,
+        Text = "✕",
+        TextColor3 = Color3.fromRGB(200, 200, 200),
+        TextSize = 16
+    }, Controls)
 
     local TextLabel = Custom:Create("TextLabel", {
         Font = Enum.Font.GothamBold,
@@ -811,48 +745,30 @@ function Speed_Library:CreateWindow(Config)
     ScrollTab.ChildAdded:Connect(UpdateSize)
     ScrollTab.ChildRemoved:Connect(UpdateSize)
 
-    -- Yellow Button (Minimize) functionality
+-- Minimize Function
     YellowButton.Activated:Connect(function()
-        -- Hover effect
-        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
-        task.wait(0.1)
-        TweenService:Create(YellowButton, TweenInfo.new(0.1), {BackgroundColor3 = Custom.MacYellowButton}):Play()
-        
         DropShadowHolder.Visible = false
         if not Open_Close.Visible then Open_Close.Visible = true end
     end)
 
-    Open_Close.Activated:Connect(function()
-        DropShadowHolder.Visible = true
-        if Open_Close.Visible then Open_Close.Visible = false end
-    end)
-
-    -- Red Button (Close) functionality
+    -- Close Function
     RedButton.Activated:Connect(function()
-        -- Hover effect
-        TweenService:Create(RedButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
-        task.wait(0.1)
-        
         if SpeedHubXGui then SpeedHubXGui:Destroy() end
         if not Speed_Library.Unloaded then Speed_Library.Unloaded = true end
     end)
 
-    -- Hover effects for mac buttons
-    RedButton.MouseEnter:Connect(function()
-        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 120, 110)}):Play()
-    end)
+    -- Simple Hover Effects
+    local function AddHover(btn, hoverColor)
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = hoverColor}):Play()
+        end)
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
+        end)
+    end
 
-    RedButton.MouseLeave:Connect(function()
-        TweenService:Create(RedButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacRedButton}):Play()
-    end)
-
-    YellowButton.MouseEnter:Connect(function()
-        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 200, 90)}):Play()
-    end)
-
-    YellowButton.MouseLeave:Connect(function()
-        TweenService:Create(YellowButton, TweenInfo.new(0.15), {BackgroundColor3 = Custom.MacYellowButton}):Play()
-    end)
+    AddHover(YellowButton, Color3.fromRGB(255, 200, 0)) -- Kuning pas hover
+    AddHover(RedButton, Color3.fromRGB(255, 50, 50))    -- Merah pas hover
 
     DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
     MakeDraggable(Top, DropShadowHolder)
