@@ -1159,23 +1159,40 @@ function Speed_Library:CreateWindow(Config)
             end
         end)
 		SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
-			local InputText = SearchInput.Text:lower()
-			
-			for _, Feature in pairs(ScrolLayers:GetChildren()) do
-				-- Pastikan kita tidak menyembunyikan SearchFrame itu sendiri atau UI Layout
-				if Feature:IsA("Frame") and Feature.Name ~= "SearchFrame" then
-					-- Cari TextLabel di dalam fitur (biasanya Title fitur)
-					local FeatureTitle = Feature:FindFirstChildWhichIsA("TextLabel", true)
-					
-					if FeatureTitle then
-						if string.find(FeatureTitle.Text:lower(), InputText) then
-							Feature.Visible = true
-						else
-							Feature.Visible = false
-						end
-					end
-				end
-			end
+		    local InputText = SearchInput.Text:lower()
+		    
+		    for _, Section in pairs(ScrolLayers:GetChildren()) do
+		        -- 1. Abaikan SearchFrame dan UI layout
+		        if Section:IsA("Frame") and Section.Name ~= "SearchFrame" then
+		            local SectionHasVisibleFeature = false
+		            
+		            -- 2. Masuk ke dalam Section untuk cari fitur (Toggle, Button, Slider, dll)
+		            -- Asumsi fitur-fitur ada di dalam Section langsung atau folder di dalamnya
+		            for _, Feature in pairs(Section:GetChildren()) do
+		                if Feature:IsA("Frame") or Feature:IsA("TextButton") then
+		                    -- Cari judul fiturnya
+		                    local FeatureTitle = Feature:FindFirstChildWhichIsA("TextLabel", true)
+		                    
+		                    if FeatureTitle then
+		                        if InputText == "" or string.find(FeatureTitle.Text:lower(), InputText) then
+		                            Feature.Visible = true
+		                            SectionHasVisibleFeature = true -- Tandai kalau ada fitur yang cocok
+		                        else
+		                            Feature.Visible = false
+		                        end
+		                    end
+		                end
+		            end
+		            
+		            -- 3. Kalau di dalam Section GA ADA fitur yang cocok, sembunyiin sekalian Section-nya
+		            -- Kalau ada minimal satu fitur yang cocok atau input kosong, Section tetep muncul
+		            if InputText == "" then
+		                Section.Visible = true
+		            else
+		                Section.Visible = SectionHasVisibleFeature
+		            end
+		        end
+		    end
 		end)
 		
         local Sections, CountSection = {}, 0
