@@ -516,7 +516,7 @@ function Speed_Library:CreateWindow(Config)
         Size = UDim2.new(0, 25, 0, 25),
         BackgroundTransparency = 1,
         Font = Enum.Font.GothamBold,
-        Text = "✕",
+        Text = "X",
         TextColor3 = Color3.fromRGB(200, 200, 200),
         TextSize = 16
     }, Controls)
@@ -745,11 +745,24 @@ function Speed_Library:CreateWindow(Config)
     ScrollTab.ChildAdded:Connect(UpdateSize)
     ScrollTab.ChildRemoved:Connect(UpdateSize)
 
--- Minimize Function
-    YellowButton.Activated:Connect(function()
-        DropShadowHolder.Visible = false
-        if not Open_Close.Visible then Open_Close.Visible = true end
-    end)
+-- Yellow Button (Minimize)
+	YellowButton.Activated:Connect(function()
+		-- Sembunyikan UI Utama (ThanHub)
+		DropShadowHolder.Visible = false
+		
+		-- Munculkan tombol floating untuk buka lagi
+		if Open_Close then 
+			Open_Close.Visible = true 
+		end
+	end)
+
+Open_Close.Activated:Connect(function()
+    -- Munculkan lagi UI Utama
+    DropShadowHolder.Visible = true
+    
+    -- Sembunyikan tombol floating
+    Open_Close.Visible = false
+end)
 
     -- Close Function
     RedButton.Activated:Connect(function()
