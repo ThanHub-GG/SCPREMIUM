@@ -1125,21 +1125,20 @@ end)
             }, ChooseFrame)
         end
 
--- Taruh dua baris ini di bagian paling atas script luar
-local CurrentSelectedTab = nil
-local GlobalChooseFrame = nil
-
--- [GANTI BLOK TabButton.Activated KAMU DENGAN KODE DI BAWAH INI]
 TabButton.Activated:Connect(function()
-    -- Jika tab yang diklik sudah aktif, tidak perlu menjalankan ulang
-    if CurrentSelectedTab == Tab then return end
+    -- 1. Cek apakah Tab valid
+    if not Tab or CurrentSelectedTab == Tab then return end
+    
+    -- 2. Efek klik (Cek dulu fungsinya ada atau tidak)
+    if CircleClick then
+        pcall(function()
+            CircleClick(TabButton, game:GetService("Players").LocalPlayer:GetMouse().X, game:GetService("Players").LocalPlayer:GetMouse().Y)
+        end)
+    end
 
-    -- Efek klik lingkaran (Visual saja)
-    CircleClick(TabButton, Player:GetMouse().X, Player:GetMouse().Y)
-
-    -- 1. Optimasi: Cari ChooseFrame satu kali saja jika belum tersimpan
+    -- 3. Cari ChooseFrame (Hanya sekali saja)
     if not GlobalChooseFrame then
-        for _, child dalam pairs(ScrollTab:GetChildren()) do
+        for _, child in pairs(ScrollTab:GetChildren()) do
             local found = child:FindFirstChild("ChooseFrame")
             if found then 
                 GlobalChooseFrame = found 
@@ -1148,41 +1147,39 @@ TabButton.Activated:Connect(function()
         end
     end
 
-    -- 2. Kembalikan visual Tab yang sebelumnya aktif ke posisi normal (Tanpa loop semua tab)
-    if CurrentSelectedTab then
-        local oldStroke = CurrentSelectedTab:FindFirstChild("UIStroke")
-        TweenService:Create(CurrentSelectedTab, TweenInfo.new(0.25), {BackgroundTransparency = 0.7}):Play()
+    -- 4. Reset Tab lama ke visual normal
+    if CurrentSelectedTab and CurrentSelectedTab:IsA("GuiObject") then
+        local oldStroke = CurrentSelectedTab:FindFirstChildOfClass("UIStroke")
+        game:GetService("TweenService"):Create(CurrentSelectedTab, TweenInfo.new(0.2), {BackgroundTransparency = 0.7}):Play()
         if oldStroke then
-            TweenService:Create(oldStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
+            game:GetService("TweenService"):Create(oldStroke, TweenInfo.new(0.2), {Transparency = 0.8}):Play()
         end
     end
 
-    -- 3. Set Tab baru yang diklik menjadi aktif
+    -- 5. Aktifkan Tab baru
     CurrentSelectedTab = Tab
-    local newStroke = Tab:FindFirstChild("UIStroke")
-    TweenService:Create(Tab, TweenInfo.new(0.25), {BackgroundTransparency = 0.3}):Play()
+    local newStroke = Tab:FindFirstChildOfClass("UIStroke")
+    game:GetService("TweenService"):Create(Tab, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
     if newStroke then
-        TweenService:Create(newStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
+        game:GetService("TweenService"):Create(newStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
     end
 
-    -- 4. Pindahkan indikator (ChooseFrame) secara instan ke posisi Tab baru
+    -- 6. Pindahkan Indikator (ChooseFrame)
     if GlobalChooseFrame then
-        local targetY = 12 + (37 * Tab.LayoutOrder)
-        TweenService:Create(GlobalChooseFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        local targetY = 12 + (37 * (Tab.LayoutOrder or 0))
+        game:GetService("TweenService"):Create(GlobalChooseFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
             Position = UDim2.new(0, 3, 0, targetY)
         }):Play()
-        
-        -- Efek animasi memanjang sedikit (Stretch) biar keren
-        task.spawn(function()
-            TweenService:Create(GlobalChooseFrame, TweenInfo.new(0.2), {Size = UDim2.new(0, 2, 0, 22)}):Play()
-            task.wait(0.2)
-            TweenService:Create(GlobalChooseFrame, TweenInfo.new(0.15), {Size = UDim2.new(0, 2, 0, 16)}):Play()
-        end)
     end
 
-    -- 5. Pindah Halaman & Update Nama Tab (Tanpa delay task.wait)
-    LayersPageLayout:JumpToIndex(Tab.LayoutOrder)
-    NameTab.Text = _Name
+    -- 7. Pindah Halaman & Ganti Teks Judul
+    if LayersPageLayout and LayersPageLayout:IsA("UIPageLayout") then
+        LayersPageLayout:JumpToIndex(Tab.LayoutOrder or 0)
+    end
+    
+    if NameTab and NameTab:IsA("TextLabel") then
+        NameTab.Text = _Name or "Tab"
+    end
 end)
 		
         local Sections, CountSection = {}, 0
