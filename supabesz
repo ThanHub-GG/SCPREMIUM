@@ -446,11 +446,44 @@ function Speed_Library:CreateWindow(Config)
     local Funcs = {}
 
     
-  local SpeedHubXGui = Custom:Create("ScreenGui", {
-      Name = "ShieldTeam || Luowis",
+local SpeedHubXGui = Custom:Create("ScreenGui", {
+      Name = "ThanHub || Than",
       ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     }, RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui"))
     ProtectGui(SpeedHubXGui)
+
+    -- 🌟 TAMBAHKAN KODE INI TEPAT DI SINI (DI BAWAH PROTECTGUI) 🌟
+    SpeedHubXGui.Destroying:Connect(function()
+        print("[ThanHub Cleanup] UI Terdeteksi di-destroy! Mereset semua fitur di Supabase...")
+        
+        -- 1. Kosongkan semua list fitur yang aktif di memory game
+        _G.ThanHubFeatures = {}
+
+        -- 2. Kirim update kosong ("None") ke Supabase secara instan sebelum thread UI mati sepenuhnya
+        local httpRequest = (request or (http and http.request) or http_request)
+        if httpRequest then
+            local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name
+            local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
+            local payload = '{"active_features": "None"}'
+
+            -- Dijalankan langsung tanpa task.spawn agar request terkirim sebelum thread UI mati total
+            pcall(function()
+                httpRequest({
+                    Url = url,
+                    Method = "PATCH",
+                    Headers = {
+                        ["apikey"] = apiKey,
+                        ["Authorization"] = "Bearer " .. apiKey,
+                        ["Content-Type"] = "application/json",
+                        ["Prefer"] = "return=minimal"
+                    },
+                    Body = payload
+                })
+            end)
+            print("[ThanHub Cleanup] Berhasil mereset status database menjadi 'None'.")
+        end
+    end)
+    -- 🌟 AKHIR KODE TAMBAHAN 🌟
 
     local DropShadowHolder = Custom:Create("Frame", {
         BackgroundTransparency = 1,
