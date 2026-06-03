@@ -1912,26 +1912,27 @@ local function pushFeaturesToSupabase()
     end)
 end
 
--- ========================================================
--- STRUKTUR TOGGLE UTAMA
--- ========================================================
 ToggleButton.Activated:Connect(function()
     Funcs_Toggle.Value = not Funcs_Toggle.Value
     Funcs_Toggle:Set(Funcs_Toggle.Value)
-    -- Saat user klik manual di game, langsung push status terbaru ke database
+    -- Saat diklik manual di game, kirim status terbaru ke Supabase
     pushFeaturesToSupabase()
 end)
 
 function Funcs_Toggle:Set(Value)
-    Funcs_Toggle.Value = Value
+    -- 1. SINKRONISASI UTAMA: Paksa nilai internal UI berubah agar script fitur mendeteksi status TRUE/FALSE yang benar
+    Funcs_Toggle.Value = Value 
+    
+    -- 2. Jalankan fungsi bawaan UI (Menyalakan skrip & animasi tombol)
     Callback(Value)
     Animate(Value)
 
+    -- 3. Update tabel sharing data database
     _G.ThanHubFeatures = _G.ThanHubFeatures or {}
     _G.ThanHubFeatures[Title] = Value
 end
 
--- Simpan objek instansiasi toggle berdasarkan Title-nya agar bisa dikontrol dari luar thread
+-- Simpan objek toggle ke memori global berdasarkan namanya (Title)
 _G.ThanHubToggleObjects[Title] = Funcs_Toggle
 
 Funcs_Toggle:Set(Default)
@@ -1943,10 +1944,9 @@ end
 -- RECV / LISTENER KENDALI JARAK JAUH DARI WEBSITE
 -- ========================================================
 task.spawn(function()
-    -- Beri jeda 5 detik saat script baru dieksekusi agar UI selesai merender semua modul
-    task.wait(5) 
+    task.wait(5) -- Tunggu UI selesai merender seluruh fitur saat pertama kali script dijalankan
     
-    while task.wait(3) do -- Lakukan sinkronisasi data dari dashboard web setiap 3 detik
+    while task.wait(3) do -- Polling ke database setiap 3 detik
         pcall(function()
             local httpRequest = (request or (http and http.request) or http_request)
             if not httpRequest then return end
@@ -1964,24 +1964,21 @@ task.spawn(function()
             })
 
             if response and response.Success and response.Body then
-                local rawData = HttpService:JSONDecode(response.Body)
+                local rawData = game:GetService("HttpService"):JSONDecode(response.Body)
                 if rawData and rawData[1] and rawData[1].active_features then
-                    -- Decode string objek dari kolom active_features
-                    local webFeatures = HttpService:JSONDecode(rawData[1].active_features)
+                    local webFeatures = game:GetService("HttpService"):JSONDecode(rawData[1].active_features)
                     
                     if webFeatures then
                         for featureTitle, webValue in pairs(webFeatures) do
                             _G.ThanHubFeatures = _G.ThanHubFeatures or {}
                             
-                            -- JIKA STATUS DI WEB BERBEDA DENGAN DI GAME (ADA EVENT NYALAKAN/MATIKAN DARI WEB)
+                            -- Deteksi jika ada perubahan status antara Website dan In-Game
                             if _G.ThanHubFeatures[featureTitle] ~= webValue then
-                                -- Update data sharing global di game
-                                _G.ThanHubFeatures[featureTitle] = webValue
                                 
-                                -- Cari objek toggle di memori game
+                                -- Cari object toggle yang cocok dengan nama fitur (misal: "Auto Shake")
                                 local targetToggle = _G.ThanHubToggleObjects[featureTitle]
                                 if targetToggle then
-                                    -- Jalankan fungsi :Set bawaan UI untuk trigger callback dan animasi in-game
+                                    -- Paksa jalankan fungsi Set secara live di game
                                     targetToggle:Set(webValue)
                                 end
                             end
@@ -1992,6 +1989,7 @@ task.spawn(function()
         end)
     end
 end)
+
    function Item:AddSlider(Config)
         local Title = Config[1] or Config.Title or ""
         local Content = Config[2] or Config.Content or ""
