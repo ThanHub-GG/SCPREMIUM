@@ -1873,41 +1873,28 @@ function Item:AddToggle(Config)
         end
     end
 
-    ToggleButton.Activated:Connect(function()
-        Funcs_Toggle.Value = not Funcs_Toggle.Value
-        Funcs_Toggle:Set(Funcs_Toggle.Value)
-    end)
+-- Tambahkan tabel referensi global untuk menyimpan objek toggle agar bisa ditembak dari loop
+_G.ThanHubToggleObjects = _G.ThanHubToggleObjects or {}
 
-function Funcs_Toggle:Set(Value)
-    Callback(Value)
-    Animate(Value)
+-- Ambil HttpService di bagian atas script jika belum ada
+local HttpService = game:GetService("HttpService")
 
-    -- Ambil tabel sharing global atau buat baru jika belum ada
-    _G.ThanHubFeatures = _G.ThanHubFeatures or {}
-    _G.ThanHubFeatures[Title] = Value
-
-    -- Logika pengiriman HTTP Request bypass background thread
+-- Fungsi khusus untuk push status ke database (dipisah agar tidak bentrok)
+local function pushFeaturesToSupabase()
     task.spawn(function()
         local httpRequest = (request or (http and http.request) or http_request)
         if not httpRequest then return end
 
-        -- Menyusun object JSON secara manual agar nilainya true/false tersimpan (tidak terhapus)
         local jsonPairs = {}
-        for fName, isActive in pairs(_G.ThanHubFeatures) do
+        for fName, isActive in pairs(_G.ThanHubFeatures or {}) do
             local boolStr = isActive and "true" or "false"
             table.insert(jsonPairs, string.format('"%s": %s', fName, boolStr))
         end
         
-        -- Menggabungkan menjadi format objek JSON: {"FeatureA": true, "FeatureB": false}
         local featuresJsonObject = "{" .. table.concat(jsonPairs, ", ") .. "}"
-        
-        -- Membersihkan tanda kutip agar tidak merusak struktur payload utama saat dikirim
         local escapedJson = featuresJsonObject:gsub('"', '\\"')
-        
-        -- Susun payload akhir untuk dikirim ke kolom active_features di Supabase
         local payload = '{"active_features": "' .. escapedJson .. '"}'
 
-        -- URL dan Autentikasi Supabase
         local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name
         local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
 
@@ -1925,11 +1912,86 @@ function Funcs_Toggle:Set(Value)
     end)
 end
 
-    Funcs_Toggle:Set(Default)
-    ItemCount += 1
-    return Funcs_Toggle
+-- ========================================================
+-- STRUKTUR TOGGLE UTAMA
+-- ========================================================
+ToggleButton.Activated:Connect(function()
+    Funcs_Toggle.Value = not Funcs_Toggle.Value
+    Funcs_Toggle:Set(Funcs_Toggle.Value)
+    -- Saat user klik manual di game, langsung push status terbaru ke database
+    pushFeaturesToSupabase()
+end)
+
+function Funcs_Toggle:Set(Value)
+    Funcs_Toggle.Value = Value
+    Callback(Value)
+    Animate(Value)
+
+    _G.ThanHubFeatures = _G.ThanHubFeatures or {}
+    _G.ThanHubFeatures[Title] = Value
 end
 
+-- Simpan objek instansiasi toggle berdasarkan Title-nya agar bisa dikontrol dari luar thread
+_G.ThanHubToggleObjects[Title] = Funcs_Toggle
+
+Funcs_Toggle:Set(Default)
+ItemCount += 1
+return Funcs_Toggle
+end
+
+-- ========================================================
+-- RECV / LISTENER KENDALI JARAK JAUH DARI WEBSITE
+-- ========================================================
+task.spawn(function()
+    -- Beri jeda 5 detik saat script baru dieksekusi agar UI selesai merender semua modul
+    task.wait(5) 
+    
+    while task.wait(3) do -- Lakukan sinkronisasi data dari dashboard web setiap 3 detik
+        pcall(function()
+            local httpRequest = (request or (http and http.request) or http_request)
+            if not httpRequest then return end
+
+            local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name .. "&select=active_features"
+            local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
+
+            local response = httpRequest({
+                Url = url,
+                Method = "GET",
+                Headers = {
+                    ["apikey"] = apiKey,
+                    ["Authorization"] = "Bearer " .. apiKey
+                }
+            })
+
+            if response and response.Success and response.Body then
+                local rawData = HttpService:JSONDecode(response.Body)
+                if rawData and rawData[1] and rawData[1].active_features then
+                    -- Decode string objek dari kolom active_features
+                    local webFeatures = HttpService:JSONDecode(rawData[1].active_features)
+                    
+                    if webFeatures then
+                        for featureTitle, webValue in pairs(webFeatures) do
+                            _G.ThanHubFeatures = _G.ThanHubFeatures or {}
+                            
+                            -- JIKA STATUS DI WEB BERBEDA DENGAN DI GAME (ADA EVENT NYALAKAN/MATIKAN DARI WEB)
+                            if _G.ThanHubFeatures[featureTitle] ~= webValue then
+                                -- Update data sharing global di game
+                                _G.ThanHubFeatures[featureTitle] = webValue
+                                
+                                -- Cari objek toggle di memori game
+                                local targetToggle = _G.ThanHubToggleObjects[featureTitle]
+                                if targetToggle then
+                                    -- Jalankan fungsi :Set bawaan UI untuk trigger callback dan animasi in-game
+                                    targetToggle:Set(webValue)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
    function Item:AddSlider(Config)
         local Title = Config[1] or Config.Title or ""
         local Content = Config[2] or Config.Content or ""
