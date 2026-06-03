@@ -1879,43 +1879,51 @@ function Item:AddToggle(Config)
     end)
 
 function Funcs_Toggle:Set(Value)
-        Callback(Value)
-        Animate(Value)
+    Callback(Value)
+    Animate(Value)
 
-        -- Ambil tabel sharing global atau buat baru jika belum ada
-        _G.ThanHubFeatures = _G.ThanHubFeatures or {}
-        _G.ThanHubFeatures[Title] = Value
+    -- Ambil tabel sharing global atau buat baru jika belum ada
+    _G.ThanHubFeatures = _G.ThanHubFeatures or {}
+    _G.ThanHubFeatures[Title] = Value
 
-        -- Logika pengiriman HTTP Request bypass background thread
-        task.spawn(function()
-            local httpRequest = (request or (http and http.request) or http_request)
-            if not httpRequest then return end
+    -- Logika pengiriman HTTP Request bypass background thread
+    task.spawn(function()
+        local httpRequest = (request or (http and http.request) or http_request)
+        if not httpRequest then return end
 
-            local activeList = {}
-            for fName, isActive in pairs(_G.ThanHubFeatures) do
-                if isActive then
-                    table.insert(activeList, fName)
-                end
-            end
+        -- Menyusun object JSON secara manual agar formatnya menjadi {"FiturA": true, "FiturB": false}
+        local jsonPairs = {}
+        for fName, isActive in pairs(_G.ThanHubFeatures) do
+            -- Mengonversi boolean Lua ke string boolean JSON (true/false)
+            local boolStr = isActive and "true" or "false"
+            table.insert(jsonPairs, string.format('"%s": %s', fName, boolStr))
+        end
+        
+        -- Bungkus semua pasangan key-value ke dalam tanda kurung kurawal {}
+        local featuresJsonObject = "{" .. table.concat(jsonPairs, ", ") .. "}"
+        
+        -- URL dan Autentikasi Supabase
+        local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name
+        local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
+        
+        -- Kirim payload object JSON utuh ke kolom active_features
+        local payload = '{"active_features": ' .. HttpService:JSONEncode(featuresJsonObject) .. '}'
+        -- Catatan: Jika kolom `active_features` di database kamu bertipe TEXT/VARCHAR, gunakan format escape string di bawah ini:
+        local payload = string.format('{"active_features": "%s"}', featuresJsonObject:gsub('"', '\\"'))
 
-            local activeFeaturesString = #activeList > 0 and table.concat(activeList, ", ") or "None"
-            local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name
-            local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
-            local payload = '{"active_features": "' .. activeFeaturesString .. '"}'
-
-            httpRequest({
-                Url = url,
-                Method = "PATCH",
-                Headers = {
-                    ["apikey"] = apiKey,
-                    ["Authorization"] = "Bearer " .. apiKey,
-                    ["Content-Type"] = "application/json",
-                    ["Prefer"] = "return=minimal"
-                },
-                Body = payload
-            })
-        end)
-    end
+        httpRequest({
+            Url = url,
+            Method = "PATCH",
+            Headers = {
+                ["apikey"] = apiKey,
+                ["Authorization"] = "Bearer " .. apiKey,
+                ["Content-Type"] = "application/json",
+                ["Prefer"] = "return=minimal"
+            },
+            Body = payload
+        })
+    end)
+end
 
     Funcs_Toggle:Set(Default)
     ItemCount += 1
