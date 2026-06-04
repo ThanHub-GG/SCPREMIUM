@@ -452,24 +452,25 @@ local SpeedHubXGui = Custom:Create("ScreenGui", {
     }, RunService:IsStudio() and Player.PlayerGui or game:GetService("CoreGui"))
     ProtectGui(SpeedHubXGui)
 
-    -- 🌟 TAMBAHKAN KODE INI TEPAT DI SINI (DI BAWAH PROTECTGUI) 🌟
+    -- 🌟 KODE CLEANUP YANG SUDAH TERINTEGRASI FIELD STATUS OFFLINE 🌟
     SpeedHubXGui.Destroying:Connect(function()
         print("[ThanHub Cleanup] UI Terdeteksi di-destroy! Mereset semua fitur dan status di Supabase...")
         
-        -- 1. Kosongkan semua list fitur yang aktif di memory game
+        -- 1. Matikan flag loop tracker utama & kosongkan memory fitur
+        _G.ThanHubRunning = false 
         _G.ThanHubFeatures = {}
 
         -- 2. Kirim update kosong & status offline ke Supabase secara instan
         local httpRequest = (request or (http and http.request) or http_request)
         if httpRequest then
-            local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. Player.Name
+            -- Ditambahkan UrlEncode agar aman jika username player mengandung karakter khusus/spasi
+            local url = "https://wrtyduofzarwuwcimpgn.supabase.co/rest/v1/session_feature?username=eq." .. game:GetService("HttpService"):UrlEncode(Player.Name)
             local apiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndydHlkdW9memFyd3V3Y2ltcGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjQzNDEsImV4cCI6MjA5NTE0MDM0MX0.6kscBmMLaLRMjZVaZ3_L4fHZsE27I5v08AkO1esOlrM"
             
-            -- Payload disetel agar last_ping = 0 (memaksa dashboard membaca player sebagai Offline)
-            -- dan current_game disetel menjadi "Offline"
-            local payload = '{"active_features": "None", "last_ping": 0, "current_game": "Offline"}'
+            -- 🔥 UPDATE: Menambahkan "status": "Offline" ke dalam payload database kamu
+            local payload = '{"active_features": "None", "last_ping": 0, "current_game": "Offline", "status": "Offline"}'
 
-            -- Dijalankan synchronous (tanpa task.spawn) agar request selesai sebelum UI thread mati total
+            -- Dijalankan secara synchronous (tanpa task.spawn) agar request selesai tepat sebelum UI thread mati total
             pcall(function()
                 httpRequest({
                     Url = url,
@@ -486,7 +487,7 @@ local SpeedHubXGui = Custom:Create("ScreenGui", {
             print("[ThanHub Cleanup] Berhasil mereset status database menjadi Offline.")
         end
     end)
-    -- 🌟 AKHIR KODE TAMBAHAN 🌟
+    -- 🌟 AKHIR KODE CLEANUP 🌟
 
     local DropShadowHolder = Custom:Create("Frame", {
         BackgroundTransparency = 1,
